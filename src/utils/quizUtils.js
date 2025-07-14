@@ -8,6 +8,25 @@ export const getNextReviewDate = (streak) => {
   return now;
 };
 
+// quizUtils.js
+
+/**
+ * Filters out history entries older than N days.
+ * @param {Array} history - Array of quiz session objects with a .date field.
+ * @param {number} days - Number of days to keep history for (default 30).
+ * @returns {Array} Filtered quiz history array.
+ */
+export function filterOldHistory(history, days = 30) {
+  const now = new Date();
+  return history.filter((entry) => {
+    if (!entry.date) return false; // safety
+    const entryDate = new Date(entry.date);
+    const diffMs = now - entryDate;
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    return diffDays <= days;
+  });
+}
+
 export const getWordsForQuiz = (words, limit) => {
   if (!words || words.length === 0) return [];
 
@@ -22,8 +41,8 @@ export const generateOptions = (correctWord, allWords) => {
   if (!correctWord || !allWords) return [];
   const options = [correctWord.meaning];
   const distractors = allWords
-    .filter(word => word.id !== correctWord.id)
-    .map(word => word.meaning);
+    .filter((word) => word.id !== correctWord.id)
+    .map((word) => word.meaning);
 
   // Shuffle distractors to get random ones
   for (let i = distractors.length - 1; i > 0; i--) {

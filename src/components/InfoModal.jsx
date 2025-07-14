@@ -6,11 +6,12 @@ const InfoModal = ({
   open,
   onClose,
   onConfirm,
-  onAddOnlyNew, // New prop for "Add Only New Words" button
+  onAddOnlyNew, // Optional: "Add Only New Words" button handler
   title,
   message,
   type = "info", // 'info', 'confirm', 'success', 'error'
   maxWidth = 400,
+  importOptions = [],
 }) => {
   const modalStyle = {
     position: "absolute",
@@ -18,7 +19,7 @@ const InfoModal = ({
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "90%",
-    maxWidth: maxWidth,
+    maxWidth,
     bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
@@ -26,8 +27,8 @@ const InfoModal = ({
     textAlign: "center",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
     alignItems: "center",
+    outline: "none",
   };
 
   const iconStyle = {
@@ -41,14 +42,29 @@ const InfoModal = ({
     error: <Cancel color="error" sx={iconStyle} />,
   };
 
+  // Button arrangement based on importOptions for full flexibility
+  const showAddOnlyNew =
+    type === "confirm" &&
+    typeof onAddOnlyNew === "function" &&
+    importOptions?.includes("addOnlyNew");
+  const showConfirm = type === "confirm";
+  const confirmLabel = showConfirm ? "Confirm" : "OK";
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <Paper sx={modalStyle}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
+    >
+      <Paper sx={modalStyle} tabIndex={-1}>
         {icons[type]}
-        <Typography variant="h5" component="h2" sx={{ mb: 2 }}>
+        <Typography id="modal-title" variant="h5" component="h2" sx={{ mb: 2 }}>
           {title}
         </Typography>
-        <Box sx={{ mb: 4, width: "100%" }}>{message}</Box>
+        <Box id="modal-description" sx={{ mb: 4, width: "100%" }}>
+          {message}
+        </Box>
         <Box
           sx={{
             display: "flex",
@@ -58,7 +74,7 @@ const InfoModal = ({
             flexWrap: "wrap",
           }}
         >
-          {type === "confirm" && (
+          {showConfirm && (
             <Button
               variant="outlined"
               onClick={onClose}
@@ -69,7 +85,7 @@ const InfoModal = ({
               Cancel
             </Button>
           )}
-          {type === "confirm" && onAddOnlyNew && (
+          {showAddOnlyNew && (
             <Button
               variant="outlined"
               onClick={onAddOnlyNew}
@@ -83,12 +99,13 @@ const InfoModal = ({
           <Button
             variant="contained"
             onClick={onConfirm || onClose}
-            color={type === "confirm" ? "primary" : "inherit"}
-            startIcon={type === "confirm" ? <CheckCircle /> : null}
+            color={showConfirm ? "primary" : "inherit"}
+            startIcon={showConfirm ? <CheckCircle /> : null}
             size="large"
             sx={{ flexGrow: 1 }}
+            autoFocus
           >
-            {type === "confirm" ? "Confirm" : "OK"}
+            {confirmLabel}
           </Button>
         </Box>
       </Paper>

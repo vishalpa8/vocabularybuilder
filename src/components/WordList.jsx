@@ -1,44 +1,96 @@
-import React from 'react';
-import { useWords } from '../hooks/useWords';
-import WordCard from './WordCard';
-import { Grid, Typography, Box, CircularProgress } from '@mui/material';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import React from "react";
+import { useWords } from "../hooks/useWords";
+import WordCard from "./WordCard";
+import { Grid, Typography, Box, CircularProgress } from "@mui/material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-const WordList = ({ searchTerm }) => {
+const WordList = ({
+  searchTerm = "",
+  showFavourites = false,
+  selectedTag = "",
+}) => {
   const { words } = useWords();
 
-  if (typeof words === 'undefined') {
+  if (typeof words === "undefined") {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
         <CircularProgress />
       </Box>
     );
   }
 
-  const filteredWords = words.filter((word) =>
-    word.word.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  let filteredWords = words;
+
+  if (showFavourites) {
+    filteredWords = filteredWords.filter((word) => !!word.isFavorite);
+  }
+
+  if (selectedTag) {
+    filteredWords = filteredWords.filter(
+      (word) => Array.isArray(word.tags) && word.tags.includes(selectedTag)
+    );
+  }
+
+  const search = searchTerm.trim().toLowerCase();
+  if (search) {
+    filteredWords = filteredWords.filter((word) =>
+      (word.word || "").toLowerCase().includes(search)
+    );
+  }
+
+  let emptyMsg = "No Words Found";
+  if (showFavourites && selectedTag) {
+    emptyMsg = `No Favourites with tag "${selectedTag}"`;
+  } else if (showFavourites) {
+    emptyMsg = "No Favourites Yet!";
+  } else if (selectedTag) {
+    emptyMsg = `No Words Found for tag "${selectedTag}"`;
+  }
 
   if (filteredWords.length === 0) {
     return (
-      <Box sx={{ textAlign: 'center', my: 4, p: 4, border: '2px dashed grey', borderRadius: '12px' }}>
-        <AddCircleOutlineIcon sx={{ fontSize: 48, color: 'grey.500', mb: 2 }} />
-        <Typography variant="h6">No Words Found</Typography>
+      <Box
+        sx={{
+          textAlign: "center",
+          my: 4,
+          p: 4,
+          border: "2px dashed grey",
+          borderRadius: "12px",
+        }}
+      >
+        <AddCircleOutlineIcon sx={{ fontSize: 48, color: "grey.500", mb: 2 }} />
+        <Typography variant="h6">{emptyMsg}</Typography>
         <Typography color="text.secondary">
-          {searchTerm ? 'Try a different search term' : 'Click "Add Word" to start your collection!'}
+          {search
+            ? "Try a different search term"
+            : showFavourites
+            ? "Mark words as favourite to see them here."
+            : selectedTag
+            ? "Try another tag or add words with this tag."
+            : 'Click "Add Word" to start your collection!'}
         </Typography>
       </Box>
     );
   }
 
   return (
-    <Grid container spacing={3}>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "1fr",
+          sm: "1fr 1fr",
+          md: "1fr 1fr 1fr",
+        },
+        gap: 3,
+      }}
+    >
       {filteredWords.map((word) => (
-        <Grid item xs={12} sm={12} md={12} key={word.id}>
+        <Box key={word.id}>
           <WordCard word={word} />
-        </Grid>
+        </Box>
       ))}
-    </Grid>
+    </Box>
   );
 };
 

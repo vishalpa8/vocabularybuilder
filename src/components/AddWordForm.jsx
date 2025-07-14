@@ -29,7 +29,10 @@ import { areWordContentsEqual } from "../utils/wordUtils";
 
 const processTags = (tagsInput) => {
   return typeof tagsInput === "string"
-    ? tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean)
+    ? tagsInput
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean)
     : Array.isArray(tagsInput)
     ? tagsInput
     : [];
@@ -72,7 +75,7 @@ const AddWordForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormState((prevState) => ({ ...prevState, [name]: value }));
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" })); // Clear error on change
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
 
   const showSnackbar = (message, severity) => {

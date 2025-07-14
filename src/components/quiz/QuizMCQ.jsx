@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Card,
   CardContent,
@@ -8,9 +8,9 @@ import {
   Grid,
   Button,
   useTheme,
-} from '@mui/material';
+} from "@mui/material";
 
-const QuizMCQ = ({ 
+const QuizMCQ = ({
   currentWord,
   options,
   isAnswered,
@@ -22,74 +22,119 @@ const QuizMCQ = ({
 }) => {
   const theme = useTheme();
 
-  const getButtonStyle = (option) => {
-    const baseStyle = {
-      minHeight: 60,
-      textTransform: 'none',
-      fontSize: '1rem',
+  // Compute button props for each option
+  const getButtonProps = (option) => {
+    const baseSx = {
+      minHeight: 56,
+      fontSize: "1rem",
+      textTransform: "none",
+      fontWeight: 500,
+      borderRadius: 2,
+      transition: "background .2s",
     };
 
     if (!isAnswered) {
-      return { 
-        variant: 'outlined', 
-        color: 'primary', 
+      return {
+        variant: "outlined",
+        color: "primary",
         onClick: () => handleAnswer(option),
-        sx: baseStyle 
+        disabled: false,
+        sx: baseSx,
       };
-    } else {
-      // Answer has been selected
-      if (option === currentWord.meaning) {
-        return { 
-          variant: 'contained', 
-          sx: { ...baseStyle, backgroundColor: theme.palette.success.main, color: theme.palette.success.contrastText } 
-        };
-      } else if (option === selectedAnswer) {
-        return { 
-          variant: 'contained', 
-          sx: { ...baseStyle, backgroundColor: theme.palette.error.main, color: theme.palette.error.contrastText } 
-        };
-      } else {
-        // Other options when an answer has been selected
-        return { 
-          variant: 'outlined', 
-          color: 'primary', 
-          disabled: true, 
-          sx: baseStyle 
-        };
-      }
     }
+    // After answer selected:
+    if (option === currentWord.meaning) {
+      return {
+        variant: "contained",
+        color: "success",
+        sx: {
+          ...baseSx,
+          bgcolor: theme.palette.success.main,
+          color: theme.palette.success.contrastText,
+          "&:hover": { bgcolor: theme.palette.success.dark },
+        },
+        disabled: true,
+      };
+    }
+    if (option === selectedAnswer) {
+      return {
+        variant: "contained",
+        color: "error",
+        sx: {
+          ...baseSx,
+          bgcolor: theme.palette.error.main,
+          color: theme.palette.error.contrastText,
+          "&:hover": { bgcolor: theme.palette.error.dark },
+        },
+        disabled: true,
+      };
+    }
+    return {
+      variant: "outlined",
+      color: "primary",
+      disabled: true,
+      sx: baseSx,
+    };
   };
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <Box sx={{ width: '100%', mr: 1 }}>
-          <LinearProgress variant="determinate" value={progress} />
+    <Box sx={{ maxWidth: 520, mx: "auto", mt: { xs: 1, sm: 4 } }}>
+      {/* Progress bar and question count */}
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 2 }}>
+        <Box sx={{ flex: 1 }}>
+          <LinearProgress
+            variant="determinate"
+            value={progress}
+            sx={{
+              height: 8,
+              borderRadius: 4,
+              bgcolor: "action.hover",
+            }}
+          />
         </Box>
-        <Box sx={{ minWidth: 35 }}>
-          <Typography variant="body2" color="text.secondary">{`${currentQuestion}/${totalQuestions}`}</Typography>
-        </Box>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            fontWeight: 500,
+            minWidth: 52,
+            textAlign: "center",
+          }}
+        >{`${currentQuestion}/${totalQuestions}`}</Typography>
       </Box>
-      <Card>
-        <CardContent sx={{ minHeight: 150, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Typography variant="h4" component="div" sx={{ textAlign: 'center' }}>
+
+      {/* Word card */}
+      <Card elevation={3} sx={{ mb: 3, borderRadius: 2 }}>
+        <CardContent
+          sx={{
+            minHeight: 90,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            px: 2,
+          }}
+        >
+          <Typography
+            variant="h4"
+            component="div"
+            sx={{
+              textAlign: "center",
+              wordBreak: "break-word",
+              fontWeight: 600,
+            }}
+          >
             {currentWord.word}
           </Typography>
         </CardContent>
       </Card>
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        {options.map((option, index) => {
-          const { variant, color, disabled, onClick, sx } = getButtonStyle(option);
+
+      {/* MCQ Options */}
+      <Grid container spacing={2}>
+        {options.map((option, idx) => {
+          const btnProps = getButtonProps(option);
           return (
-            <Grid item xs={12} sm={6} key={index}>
-              <Button
-                fullWidth
-                variant={variant}
-                color={color}
-                onClick={onClick}
-                disabled={disabled}
-                sx={sx}
-              >
+            <Grid item xs={12} sm={6} key={idx}>
+              <Button fullWidth {...btnProps} tabIndex={0}>
                 {option}
               </Button>
             </Grid>

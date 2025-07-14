@@ -4,6 +4,7 @@ import {
   getWordsForQuiz,
   getNextReviewDate,
   generateOptions,
+  filterOldHistory,
 } from "../utils/quizUtils";
 import {
   Box,
@@ -15,6 +16,8 @@ import {
   Select,
   FormControl,
   InputLabel,
+  Fade,
+  Stack,
 } from "@mui/material";
 import { PlayCircle } from "@mui/icons-material";
 import QuizMCQ from "./quiz/QuizMCQ";
@@ -40,10 +43,14 @@ const Quiz = () => {
     message: "",
   });
 
+  // Fade transitions
+  const [showMain, setShowMain] = useState(false);
   useEffect(() => {
-    if (words !== undefined) {
-      setIsQuizDataReady(true);
-    }
+    setShowMain(true);
+  }, []);
+
+  useEffect(() => {
+    if (words !== undefined) setIsQuizDataReady(true);
   }, [words]);
 
   useEffect(() => {
@@ -134,9 +141,11 @@ const Quiz = () => {
         setIsQuizComplete(true);
         setQuizStarted(false);
 
+        // Save new session + remove history older than 30 days
         const storedHistory = JSON.parse(
           localStorage.getItem("quizHistory") || "[]"
         );
+        const recentHistory = filterOldHistory(storedHistory, 30);
         const newSession = {
           date: new Date().toISOString(),
           score: {
@@ -147,20 +156,22 @@ const Quiz = () => {
         };
         localStorage.setItem(
           "quizHistory",
-          JSON.stringify([newSession, ...storedHistory])
+          JSON.stringify([newSession, ...recentHistory])
         );
       }
-    }, 1500);
+    }, 1000); // Shorter delay for snappier UX
   };
 
   const restartQuiz = () => {
     setIsQuizComplete(false);
     startQuiz();
   };
-  
+
   const returnToQuizSetup = () => {
     setIsQuizComplete(false);
   };
+
+  // -- Render ---------------------------------------
 
   if (!isQuizDataReady) {
     return (
@@ -171,78 +182,110 @@ const Quiz = () => {
   }
 
   if (isQuizComplete) {
-    return <QuizComplete results={quizResults} onRestart={restartQuiz} onReturn={returnToQuizSetup} />;
+    return (
+      <Fade in={showMain}>
+        <Box>
+          <QuizComplete
+            results={quizResults}
+            onRestart={restartQuiz}
+            onReturn={returnToQuizSetup}
+          />
+        </Box>
+      </Fade>
+    );
   }
 
   if (!quizStarted) {
     const totalWords = words ? words.length : 0;
-
     return (
-      <Box>
-        <Paper sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2, textAlign: 'center' }}>
-          <Typography variant="h5" gutterBottom>
-            Start a New Quiz
-          </Typography>
-          <Typography color="text.secondary" sx={{ mb: 3 }}>
-            Select the number of questions and start the test.
-          </Typography>
-          
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: 'center', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
-            <FormControl
-              variant="outlined"
-              sx={{ minWidth: 150 }}
-              disabled={totalWords === 0}
+      <Fade in={showMain}>
+        <Box>
+          <Paper
+            sx={{
+              p: { xs: 2, sm: 4 },
+              borderRadius: 2,
+              textAlign: "center",
+              maxWidth: 500,
+              mx: "auto",
+              mt: 3,
+              mb: 4,
+            }}
+            elevation={2}
+          >
+            <Typography variant="h5" gutterBottom>
+              Start a New Quiz
+            </Typography>
+            <Typography color="text.secondary" sx={{ mb: 3 }}>
+              Select the number of questions and start the test.
+            </Typography>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              justifyContent="center"
+              alignItems="center"
+              sx={{ width: "100%" }}
             >
-              <InputLabel id="quiz-limit-label">Questions</InputLabel>
-              <Select
-                labelId="quiz-limit-label"
-                value={quizLimit}
-                onChange={(e) => setQuizLimit(Number(e.target.value))}
-                label="Questions"
+              <FormControl
+                variant="outlined"
+                sx={{ minWidth: 150 }}
+                disabled={totalWords === 0}
+                size="small"
               >
-                {[5, 10, 15, 20, 25, 30].map((num) => (
-                  <MenuItem key={num} value={num}>
-                    {num} Questions
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Button
-              variant="contained"
-              size="large"
-              onClick={startQuiz}
-              startIcon={<PlayCircle />}
-              disabled={totalWords < 4}
-              sx={{ px: 4, py: 1.5 }}
-            >
-              Start Test
-            </Button>
-          </Box>
-        </Paper>
-        <QuizHistory />
-        <InfoModal
-          open={modalState.open}
-          onClose={() => setModalState({ ...modalState, open: false })}
-          onConfirm={modalState.onConfirm}
-          title={modalState.title}
-          message={modalState.message}
-          type={modalState.type}
-        />
-      </Box>
+                <InputLabel id="quiz-limit-label">Questions</InputLabel>
+                <Select
+                  labelId="quiz-limit-label"
+                  value={quizLimit}
+                  onChange={(e) => setQuizLimit(Number(e.target.value))}
+                  label="Questions"
+                >
+                  {[5, 10, 15, 20, 25, 30].map((num) => (
+                    <MenuItem key={num} value={num}>
+                      {num} Questions
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={startQuiz}
+                startIcon={<PlayCircle />}
+                disabled={totalWords < 4}
+                sx={{ px: 4, py: 1.5 }}
+              >
+                Start Test
+              </Button>
+            </Stack>
+          </Paper>
+          <QuizHistory />
+          <InfoModal
+            open={modalState.open}
+            onClose={() => setModalState({ ...modalState, open: false })}
+            onConfirm={modalState.onConfirm}
+            title={modalState.title}
+            message={modalState.message}
+            type={modalState.type}
+          />
+        </Box>
+      </Fade>
     );
   }
 
   return (
-    <QuizMCQ
-      currentWord={quizWords[currentWordIndex]}
-      options={options}
-      isAnswered={isAnswered}
-      selectedAnswer={selectedAnswer}
-      handleAnswer={handleAnswer}
-      progress={((currentWordIndex + 1) / quizWords.length) * 100}
-      currentQuestion={currentWordIndex + 1}
-      totalQuestions={quizWords.length}
-    />
+    <Fade in={showMain}>
+      <Box>
+        <QuizMCQ
+          currentWord={quizWords[currentWordIndex]}
+          options={options}
+          isAnswered={isAnswered}
+          selectedAnswer={selectedAnswer}
+          handleAnswer={handleAnswer}
+          progress={((currentWordIndex + 1) / quizWords.length) * 100}
+          currentQuestion={currentWordIndex + 1}
+          totalQuestions={quizWords.length}
+        />
+      </Box>
+    </Fade>
   );
 };
 

@@ -25,8 +25,6 @@ import {
 import InfoModal from "./InfoModal";
 import { areWordContentsEqual, normalizeWordKey } from "../utils/wordUtils";
 
-// Utility: Case-insensitive, trimmed key
-
 const Dashboard = () => {
   const { words, addWord, updateWord } = useWords();
   const [modalState, setModalState] = useState({
@@ -485,7 +483,7 @@ const Dashboard = () => {
   ).length;
 
   const StatCard = ({ title, value, icon }) => (
-    <Grid item xs={12} sm={4}>
+    <Grid item xs={12} sm={6} md={4}>
       <Paper
         sx={{
           p: 3,
@@ -493,7 +491,10 @@ const Dashboard = () => {
           alignItems: "center",
           gap: 2,
           borderRadius: 2,
+          height: "100%",
+          minHeight: 120,
         }}
+        elevation={2}
       >
         {icon}
         <Box>
@@ -508,7 +509,18 @@ const Dashboard = () => {
 
   return (
     <Box>
-      <Grid container spacing={3}>
+      {/* --- Stats Cards Row --- */}
+      <Grid
+        container
+        spacing={3}
+        sx={{
+          mb: 3,
+          mt: 1,
+          maxWidth: 1100,
+          mx: "auto",
+          justifyContent: "center",
+        }}
+      >
         <StatCard
           title="Total Words"
           value={totalWords}
@@ -525,11 +537,30 @@ const Dashboard = () => {
           icon={<Schedule sx={{ fontSize: 40 }} color="error" />}
         />
       </Grid>
-      <Paper sx={{ p: 3, mt: 4, borderRadius: 2 }}>
+
+      {/* --- Manage Data Section --- */}
+      <Paper
+        sx={{
+          p: { xs: 2, sm: 3 },
+          mt: 2,
+          borderRadius: 2,
+          maxWidth: 600,
+          mx: "auto",
+          textAlign: "center",
+        }}
+        elevation={1}
+      >
         <Typography variant="h5" sx={{ mb: 2 }}>
           Manage Your Data
         </Typography>
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
           <Button
             variant="outlined"
             onClick={handleExport}
@@ -555,6 +586,7 @@ const Dashboard = () => {
           </Button>
         </Box>
       </Paper>
+      {/* --- Modal (no changes) --- */}
       <InfoModal
         open={modalState.open}
         onClose={closeModal}
