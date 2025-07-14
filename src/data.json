@@ -1,0 +1,58 @@
+[
+  {
+    "id": "word-1694611200001",
+    "word": "Ephemeral  ",
+    "meaning": "for a very short time.",
+    "partOfSpeech": "Adjective",
+    "sampleSentence": "The beauty of the cherry blossoms is ephemeral, lasting only for a couple of weeks.",
+    "mnemonic": "Sounds like 'a funeral' - life is short.",
+    "tags": ["transience", "nature"],
+    "isFavorite": true,
+    "isLearned": false,
+    "streak": 0,
+    "lastReviewed": "2023-09-13T12:00:00.000Z",
+    "nextReview": "2023-09-14T12:00:00.000Z"
+  },
+  {
+    "id": "word-1694611200002",
+    "word": "Ubiquitous",
+    "meaning": "Present, appearing, or found everywhere.",
+    "partOfSpeech": "Adjective",
+    "sampleSentence": "have become ubiquitous in modern society.",
+    "mnemonic": "It sounds like 'you-big-as-us' - you are as big as us, so you are everywhere.",
+    "tags": ["common", "technology"],
+    "isFavorite": false,
+    "isLearned": false,
+    "streak": 7,
+    "lastReviewed": "2024-01-10T09:30:00.000Z",
+    "nextReview": "2024-07-15T09:30:00.000Z"
+  },
+  {
+    "id": "word-1694611200003",
+    "word": "Mellifluous",
+    "meaning": "A sound that is sweet and smooth, pleasing to hear.",
+    "partOfSpeech": "Adjective",
+    "sampleSentence": "The singer's mellifluous voice captivated the audience.",
+    "mnemonic": "Think of 'melody flow' - a smooth, flowing melody.",
+    "tags": ["sound", "music"],
+    "isFavorite": true,
+    "isLearned": false,
+    "streak": 2,
+    "lastReviewed": "2024-03-20T15:00:00.000Z",
+    "nextReview": "2024-03-22T15:00:00.000Z"
+  },
+  {
+    "id": "word-1694611200004",
+    "word": "Pulchritudinous",
+    "meaning": "Having great physical beauty.",
+    "partOfSpeech": "Adjective",
+    "sampleSentence": "The model was praised for her pulchritudinous features.",
+    "mnemonic": "It's a long, beautiful word for 'beautiful'.",
+    "tags": ["appearance", "beauty"],
+    "isFavorite": false,
+    "isLearned": false,
+    "streak": 0,
+    "lastReviewed": null,
+    "nextReview": "2024-01-01T00:00:00.000Z"
+  }
+]
