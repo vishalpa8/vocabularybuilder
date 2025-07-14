@@ -82,53 +82,30 @@ const QuizHistory = () => {
         {history.map((session, index) => (
           <Accordion key={session.date}>
             <AccordionSummary expandIcon={<ExpandMore />}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  alignItems: "center",
-                }}
-              >
-                <Box>
-                  <Typography sx={{ flexShrink: 0, mr: 2 }}>
-                    {formatDate(session.date)}
-                  </Typography>
-                  <Typography sx={{ color: "text.secondary" }}>
-                    Score: {session.score.correct} / {session.score.total}
-                  </Typography>
-                </Box>
+              <Box>
+                <Typography sx={{ flexShrink: 0, mr: 2 }}>
+                  {formatDate(session.date)}
+                </Typography>
+                <Typography sx={{ color: "text.secondary" }}>
+                  Score: {session.score.correct} / {session.score.total}
+                </Typography>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails
+              sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+            >
+              <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
                 <Tooltip title="Delete History">
                   <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openModal(index);
-                    }}
+                    onClick={() => openModal(index)}
                     size="small"
+                    aria-label="Delete History"
                   >
                     <Delete fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </Box>
-            </AccordionSummary>
-            <AccordionDetails>
-              <List dense>
-                {session.results.map((result, i) => (
-                  <ListItem key={i}>
-                    <ListItemIcon sx={{ minWidth: 32 }}>
-                      {result.isCorrect ? (
-                        <CheckCircle color="success" fontSize="small" />
-                      ) : (
-                        <Cancel color="error" fontSize="small" />
-                      )}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={result.word.word}
-                      secondary={`Correct: ${result.word.meaning}`}
-                    />
-                  </ListItem>
-                ))}
-              </List>
+              <List dense>{/* ... your results map here ... */}</List>
             </AccordionDetails>
           </Accordion>
         ))}
