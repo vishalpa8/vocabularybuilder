@@ -5,10 +5,10 @@ import {
   Typography,
   Box,
   LinearProgress,
-  Grid,
-  Button,
-  useTheme,
+  Paper,
+  Stack,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 const QuizMCQ = ({
   currentWord,
@@ -22,96 +22,95 @@ const QuizMCQ = ({
 }) => {
   const theme = useTheme();
 
-  // Compute button props for each option
-  const getButtonProps = (option) => {
-    const baseSx = {
-      minHeight: 56,
-      fontSize: "1rem",
-      textTransform: "none",
-      fontWeight: 500,
-      borderRadius: 2,
-      transition: "background .2s",
-    };
-
+  // Card styling logic for options
+  const getOptionCardStyle = (option) => {
     if (!isAnswered) {
       return {
-        variant: "outlined",
-        color: "primary",
-        onClick: () => handleAnswer(option),
-        disabled: false,
-        sx: baseSx,
+        mb: 1.5,
+        px: 2,
+        py: 2,
+        border: `2px solid ${theme.palette.divider}`,
+        borderRadius: 2,
+        cursor: "pointer",
+        transition: "border-color 0.3s, background 0.3s",
+        boxShadow: "none",
+        fontWeight: 500,
+        "&:hover": {
+          borderColor: theme.palette.primary.main,
+          background: theme.palette.action.hover,
+        },
+        fontSize: "1.1rem",
+        userSelect: "none",
       };
     }
-    // After answer selected:
+    // Feedback state
     if (option === currentWord.meaning) {
       return {
-        variant: "contained",
-        color: "success",
-        sx: {
-          ...baseSx,
-          bgcolor: theme.palette.success.main,
-          color: theme.palette.success.contrastText,
-          "&:hover": { bgcolor: theme.palette.success.dark },
-        },
-        disabled: true,
+        mb: 1.5,
+        px: 2,
+        py: 2,
+        border: `2.5px solid ${theme.palette.success.light}`,
+        background: theme.palette.success.light + "11", // faded green
+        borderRadius: 2,
+        fontWeight: 600,
+        fontSize: "1.1rem",
+        userSelect: "none",
+        boxShadow: "0 0 0 2px " + theme.palette.success.main + "44",
+        color: theme.palette.success.main,
       };
-    }
-    if (option === selectedAnswer) {
+    } else if (option === selectedAnswer) {
       return {
-        variant: "contained",
-        color: "error",
-        sx: {
-          ...baseSx,
-          bgcolor: theme.palette.error.main,
-          color: theme.palette.error.contrastText,
-          "&:hover": { bgcolor: theme.palette.error.dark },
-        },
-        disabled: true,
+        mb: 1.5,
+        px: 2,
+        py: 2,
+        border: `2.5px solid ${theme.palette.error.light}`,
+        background: theme.palette.error.light + "11", // faded red
+        borderRadius: 2,
+        fontWeight: 600,
+        fontSize: "1.1rem",
+        userSelect: "none",
+        boxShadow: "0 0 0 2px " + theme.palette.error.main + "33",
+        color: theme.palette.error.main,
+        opacity: 0.97,
       };
     }
+    // Other options, lightly faded
     return {
-      variant: "outlined",
-      color: "primary",
-      disabled: true,
-      sx: baseSx,
+      mb: 1.5,
+      px: 2,
+      py: 2,
+      border: `2px solid ${theme.palette.divider}`,
+      borderRadius: 2,
+      fontWeight: 500,
+      fontSize: "1.1rem",
+      color: theme.palette.text.primary,
+      opacity: 0.72,
+      userSelect: "none",
+      background: theme.palette.background.paper,
+      cursor: "not-allowed",
     };
   };
 
   return (
-    <Box sx={{ maxWidth: 520, mx: "auto", mt: { xs: 1, sm: 4 } }}>
-      {/* Progress bar and question count */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 2 }}>
-        <Box sx={{ flex: 1 }}>
-          <LinearProgress
-            variant="determinate"
-            value={progress}
-            sx={{
-              height: 8,
-              borderRadius: 4,
-              bgcolor: "action.hover",
-            }}
-          />
+    <Box>
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <Box sx={{ width: "100%", mr: 1 }}>
+          <LinearProgress variant="determinate" value={progress} />
         </Box>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{
-            fontWeight: 500,
-            minWidth: 52,
-            textAlign: "center",
-          }}
-        >{`${currentQuestion}/${totalQuestions}`}</Typography>
+        <Box sx={{ minWidth: 35 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+          >{`${currentQuestion}/${totalQuestions}`}</Typography>
+        </Box>
       </Box>
-
-      {/* Word card */}
-      <Card elevation={3} sx={{ mb: 3, borderRadius: 2 }}>
+      <Card elevation={1}>
         <CardContent
           sx={{
-            minHeight: 90,
+            minHeight: 140,
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
-            px: 2,
+            alignItems: "center",
           }}
         >
           <Typography
@@ -119,28 +118,35 @@ const QuizMCQ = ({
             component="div"
             sx={{
               textAlign: "center",
+              fontWeight: 700,
+              letterSpacing: 0.5,
+              color: "primary.main",
               wordBreak: "break-word",
-              fontWeight: 600,
             }}
           >
             {currentWord.word}
           </Typography>
         </CardContent>
       </Card>
-
-      {/* MCQ Options */}
-      <Grid container spacing={2}>
-        {options.map((option, idx) => {
-          const btnProps = getButtonProps(option);
-          return (
-            <Grid item xs={12} sm={6} key={idx}>
-              <Button fullWidth {...btnProps} tabIndex={0}>
-                {option}
-              </Button>
-            </Grid>
-          );
-        })}
-      </Grid>
+      <Stack spacing={1.5} sx={{ mt: 2 }}>
+        {options.map((option, idx) => (
+          <Paper
+            key={option}
+            elevation={
+              isAnswered &&
+              (option === currentWord.meaning || option === selectedAnswer)
+                ? 4
+                : 1
+            }
+            sx={getOptionCardStyle(option)}
+            onClick={!isAnswered ? () => handleAnswer(option) : undefined}
+            tabIndex={0}
+            aria-disabled={isAnswered}
+          >
+            {option}
+          </Paper>
+        ))}
+      </Stack>
     </Box>
   );
 };

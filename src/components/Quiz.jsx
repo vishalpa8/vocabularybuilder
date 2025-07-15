@@ -159,7 +159,7 @@ const Quiz = () => {
           JSON.stringify([newSession, ...recentHistory])
         );
       }
-    }, 1000); // Shorter delay for snappier UX
+    }, 3200); // Extended feedback time to 3.2s
   };
 
   const restartQuiz = () => {

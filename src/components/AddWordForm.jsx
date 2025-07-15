@@ -208,7 +208,7 @@ const AddWordForm = () => {
         </Typography>
         <Divider sx={{ mb: 3 }} />
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={8}>
+          <Grid colSpan={{ xs: 12, sm: 6 }}>
             <TextField
               name="word"
               label="Word"
@@ -228,8 +228,8 @@ const AddWordForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControl fullWidth variant="outlined">
+          <Grid colSpan={{ xs: 12, sm: 6 }}>
+            <FormControl fullWidth variant="outlined" sx={{ minWidth: 160 }}>
               <InputLabel id="part-of-speech-label">Part of Speech</InputLabel>
               <Select
                 labelId="part-of-speech-label"
@@ -246,7 +246,7 @@ const AddWordForm = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid colSpan={12}>
             <TextField
               name="meaning"
               label="Meaning"
@@ -274,7 +274,7 @@ const AddWordForm = () => {
         <Divider sx={{ mb: 3 }} />
 
         <Grid container spacing={3}>
-          <Grid item xs={12}>
+          <Grid colSpan={12}>
             <TextField
               name="sampleSentence"
               label="Sample Sentence"
@@ -294,7 +294,7 @@ const AddWordForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid colSpan={12}>
             <TextField
               name="mnemonic"
               label="Mnemonic (optional)"
@@ -314,7 +314,7 @@ const AddWordForm = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid colSpan={12}>
             <TextField
               name="tags"
               label="Tags (comma-separated)"
@@ -371,5 +371,4 @@ const AddWordForm = () => {
     </>
   );
 };
-
 export default AddWordForm;

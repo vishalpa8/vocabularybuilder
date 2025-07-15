@@ -11,8 +11,10 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  IconButton,
+  Tooltip,
+  Stack,
 } from "@mui/material";
-import { downloadJson, uploadJson } from "../utils/fileUtils";
 import {
   Book,
   School,
@@ -21,9 +23,35 @@ import {
   Download,
   Info,
   ExpandMore,
+  ContentCopy,
+  CheckCircle,
 } from "@mui/icons-material";
 import InfoModal from "./InfoModal";
+import { downloadJson, uploadJson } from "../utils/fileUtils";
 import { areWordContentsEqual, normalizeWordKey } from "../utils/wordUtils";
+
+// Example JSON for Format Info (and copy)
+const exampleJSON = `[
+  {
+    "word": "Ephemeral",
+    "meaning": "Lasting for a very short time.",
+    "partOfSpeech": "Adjective",
+    "sampleSentence": "The beauty of the cherry blossoms is ephemeral.",
+    "tags": ["transience", "nature"],
+    "mnemonic": "Sounds like 'a funeral' - life is short."
+  }
+]`;
+
+function cleanUpdateObject(obj) {
+  // Remove undefined/null fields to avoid overwriting with blanks.
+  const copy = { ...obj };
+  Object.keys(copy).forEach(
+    (key) =>
+      (copy[key] === undefined || copy[key] === null || copy[key] === "") &&
+      delete copy[key]
+  );
+  return copy;
+}
 
 const Dashboard = () => {
   const { words, addWord, updateWord } = useWords();
@@ -37,6 +65,7 @@ const Dashboard = () => {
   const [fileToImport, setFileToImport] = useState(null);
   const [wordsToOverwrite, setWordsToOverwrite] = useState([]);
   const [identicalWords, setIdenticalWords] = useState([]);
+  const [copied, setCopied] = useState(false); // for copy feedback
 
   // Export words to JSON
   const handleExport = () => {
@@ -52,58 +81,106 @@ const Dashboard = () => {
     }
   };
 
-  // Show JSON format info
+  // Show JSON format info (with Copy button)
   const handleShowInfo = () => {
     setModalState({
       open: true,
       title: "JSON Format Information",
       message: (
         <Box sx={{ textAlign: "left" }}>
-          <Typography>
+          <Typography sx={{ mb: 1 }}>
             The JSON file should be an array of objects, where each object
-            represents a word. The following fields are supported:
+            represents a word.
+            <br />
+            <b>Supported fields:</b>
           </Typography>
-          <ul>
-            <li>word (string, required)</li>
-            <li>meaning (string, required)</li>
-            <li>partOfSpeech (string)</li>
-            <li>sampleSentence (string)</li>
-            <li>tags (array of strings)</li>
-            <li>mnemonic (string)</li>
+          <ul style={{ marginTop: 0, marginBottom: 12 }}>
+            <li>
+              word <i>(string, required)</i>
+            </li>
+            <li>
+              meaning <i>(string, required)</i>
+            </li>
+            <li>
+              partOfSpeech <i>(string)</i>
+            </li>
+            <li>
+              sampleSentence <i>(string)</i>
+            </li>
+            <li>
+              tags <i>(array of strings)</i>
+            </li>
+            <li>
+              mnemonic <i>(string)</i>
+            </li>
           </ul>
-          <Accordion>
+          <Accordion sx={{ mb: 1 }}>
             <AccordionSummary expandIcon={<ExpandMore />}>
-              <Typography>Example</Typography>
+              <Typography fontWeight={500}>Example (ready to use)</Typography>
             </AccordionSummary>
-            <AccordionDetails>
-              <pre
-                style={{
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-all",
-                  backgroundColor: "#f5f5f5",
-                  padding: "10px",
-                  borderRadius: "4px",
-                }}
-              >
-                <code>
-                  {`[
-  {
-    "word": "Ephemeral",
-    "meaning": "Lasting for a very short time.",
-    "partOfSpeech": "Adjective",
-    "sampleSentence": "The beauty of the cherry blossoms is ephemeral.",
-    "tags": ["transience", "nature"],
-    "mnemonic": "Sounds like 'a funeral' - life is short."
-  }
-]`}
-                </code>
-              </pre>
+            <AccordionDetails sx={{ p: 0, position: "relative" }}>
+              <Box sx={{ position: "relative", width: "100%" }}>
+                <pre
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-all",
+                    backgroundColor: "#f7f7fa",
+                    padding: "18px 12px 12px 12px",
+                    borderRadius: "6px",
+                    fontSize: 14,
+                    border: "1px solid #e0e0e0",
+                    margin: 0,
+                    minHeight: 50,
+                    fontFamily: "Menlo, Consolas, monospace",
+                    boxShadow: "none",
+                  }}
+                >
+                  <code>{exampleJSON}</code>
+                </pre>
+                <Tooltip title={copied ? "Copied!" : "Copy Example"}>
+                  <IconButton
+                    size="small"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (copied) return;
+                      try {
+                        await navigator.clipboard.writeText(exampleJSON);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 1500);
+                      } catch {}
+                    }}
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 10,
+                      background: "#f7f7fa",
+                      border: "1px solid #e0e0e0",
+                      borderRadius: "6px",
+                      p: 0.5,
+                      zIndex: 1,
+                      "&:hover": {
+                        background: "#ececf2",
+                      },
+                    }}
+                    aria-label="Copy Example JSON"
+                  >
+                    {copied ? (
+                      <CheckCircle fontSize="small" color="success" />
+                    ) : (
+                      <ContentCopy fontSize="small" />
+                    )}
+                  </IconButton>
+                </Tooltip>
+              </Box>
             </AccordionDetails>
           </Accordion>
+          <Typography fontSize={13} color="text.secondary" sx={{ mb: 0.5 }}>
+            <b>Tip:</b> You can copy, edit and import this format directly.
+          </Typography>
         </Box>
       ),
       type: "info",
-      maxWidth: 600,
+      maxWidth: 650,
     });
   };
 
@@ -112,8 +189,40 @@ const Dashboard = () => {
     const file = event.target.files[0];
     if (!file) return;
 
+    // 1. File extension/type check
+    const fileName = file.name || "";
+    const isJsonFile =
+      fileName.toLowerCase().endsWith(".json") &&
+      (file.type === "" || file.type.includes("json"));
+    if (!isJsonFile) {
+      setModalState({
+        open: true,
+        title: "Import Failed",
+        message: "Please select a valid .json file.",
+        type: "error",
+      });
+      return;
+    }
+
+    // 2. Size limit (defensive)
+    if (file.size > 2 * 1024 * 1024) {
+      // 2 MB
+      setModalState({
+        open: true,
+        title: "Import Failed",
+        message: "File is too large. Maximum allowed size is 2MB.",
+        type: "error",
+      });
+      return;
+    }
+
     try {
-      const importedWords = await uploadJson(file);
+      // 3. Read JSON
+      const importedWordsRaw = await uploadJson(file);
+      // Defensive: deep clone
+      const importedWords = JSON.parse(JSON.stringify(importedWordsRaw));
+
+      // 4. Basic array check
       if (!Array.isArray(importedWords) || importedWords.length === 0) {
         setModalState({
           open: true,
@@ -124,17 +233,60 @@ const Dashboard = () => {
         return;
       }
 
-      // Validate imported words (required fields)
+      // 5. Detect duplicates within the file
+      const seen = new Set();
+      const dupWords = [];
+      importedWords.forEach((w) => {
+        const key = w.word?.trim().toLowerCase();
+        if (key) {
+          if (seen.has(key)) dupWords.push(w.word);
+          seen.add(key);
+        }
+      });
+      if (dupWords.length > 0) {
+        setModalState({
+          open: true,
+          title: "Import Failed",
+          message: (
+            <Box>
+              <Typography>
+                The imported file contains duplicate words:{" "}
+                <b>{dupWords.join(", ")}</b>.<br />
+                Remove duplicates and try again.
+              </Typography>
+            </Box>
+          ),
+          type: "error",
+          maxWidth: 600,
+        });
+        return;
+      }
+
+      // 6. Schema/type/required validation
       const validationErrors = [];
       importedWords.forEach((word, index) => {
         const missingFields = [];
-        if (!word.word) missingFields.push('"word"');
-        if (!word.meaning) missingFields.push('"meaning"');
+        if (!word.word || typeof word.word !== "string" || !word.word.trim())
+          missingFields.push('"word" (string, required)');
+        if (
+          !word.meaning ||
+          typeof word.meaning !== "string" ||
+          !word.meaning.trim()
+        )
+          missingFields.push('"meaning" (string, required)');
+        if (
+          word.tags &&
+          !Array.isArray(word.tags) &&
+          typeof word.tags !== "string"
+        )
+          missingFields.push(
+            '"tags" (should be array or comma-separated string)'
+          );
         if (missingFields.length > 0) {
           validationErrors.push(
             `Entry ${index + 1} (word: ${
               word.word || "N/A"
-            }): Missing ${missingFields.join(" and ")} property.`
+            }): Missing or invalid ${missingFields.join(" and ")}.`
           );
         }
       });
@@ -156,7 +308,8 @@ const Dashboard = () => {
                 ))}
               </ul>
               <Typography>
-                Please ensure each word has a "word" and "meaning" property.
+                Please ensure each word has valid "word" and "meaning"
+                properties.
               </Typography>
             </Box>
           ),
@@ -166,11 +319,29 @@ const Dashboard = () => {
         return;
       }
 
-      // Build normalized word map for existing words
+      // 7. Warn on huge uploads (optional, can skip)
+      if (importedWords.length > 500) {
+        setModalState({
+          open: true,
+          title: "Import Warning",
+          message: (
+            <Typography>
+              You're trying to import {importedWords.length} words at once. For
+              best performance, consider importing smaller batches.
+            </Typography>
+          ),
+          type: "info",
+          maxWidth: 500,
+        });
+        // continue (or return) as per your policy
+      }
+
+      // 8. Continue with your existing logic for merging, duplicate/conflict detection, etc.
+
+      // -- Build normalized word map for existing words
       const existingWordMap = new Map(
         words.map((w) => [normalizeWordKey(w), w])
       );
-
       const newWords = [];
       const identical = [];
       const conflicting = [];
@@ -189,7 +360,7 @@ const Dashboard = () => {
         }
       }
 
-      // All identical (nothing to do)
+      // All identical
       if (
         newWords.length === 0 &&
         conflicting.length === 0 &&
@@ -207,7 +378,6 @@ const Dashboard = () => {
 
       // All new words
       if (newWords.length === importedWords.length) {
-        // Add all new words immediately, no confirmation needed
         let addedCount = 0;
         for (const w of newWords) {
           await addWord(w);
@@ -222,7 +392,8 @@ const Dashboard = () => {
         });
         return;
       }
-      // All conflicting (same word, different data)
+
+      // All conflicting
       if (conflicting.length === importedWords.length) {
         setFileToImport([]);
         setWordsToOverwrite(conflicting);
@@ -265,9 +436,9 @@ const Dashboard = () => {
         return;
       }
 
-      // Mix of new, identical, and conflicting
-      setFileToImport(newWords); // will be added
-      setWordsToOverwrite(conflicting); // will be overwritten
+      // Mix of new/identical/conflicting
+      setFileToImport(newWords);
+      setWordsToOverwrite(conflicting);
       setIdenticalWords(identical);
 
       let messageContent = (
@@ -390,7 +561,6 @@ const Dashboard = () => {
         const key = normalizeWordKey(word);
         const existingWord = existingWordMap.get(key);
         if (existingWord) {
-          // Clean the update to avoid blanking out data
           await updateWord(existingWord.id, cleanUpdateObject(word));
           updatedCount++;
         }
@@ -483,7 +653,7 @@ const Dashboard = () => {
   ).length;
 
   const StatCard = ({ title, value, icon }) => (
-    <Grid item xs={12} sm={6} md={4}>
+    <Grid colSpan={{ xs: 12, sm: 6, md: 4 }}>
       <Paper
         sx={{
           p: 3,
@@ -512,6 +682,7 @@ const Dashboard = () => {
       {/* --- Stats Cards Row --- */}
       <Grid
         container
+        columns={12}
         spacing={3}
         sx={{
           mb: 3,
@@ -521,21 +692,72 @@ const Dashboard = () => {
           justifyContent: "center",
         }}
       >
-        <StatCard
-          title="Total Words"
-          value={totalWords}
-          icon={<Book sx={{ fontSize: 40 }} color="primary" />}
-        />
-        <StatCard
-          title="Words Mastered"
-          value={wordsLearned}
-          icon={<School sx={{ fontSize: 40 }} color="success" />}
-        />
-        <StatCard
-          title="Due for Review"
-          value={wordsDueForReview}
-          icon={<Schedule sx={{ fontSize: 40 }} color="error" />}
-        />
+        <Grid colSpan={{ xs: 12, sm: 6, md: 4 }}>
+          <Paper
+            sx={{
+              p: 3,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              borderRadius: 2,
+              height: "100%",
+              minHeight: 120,
+            }}
+            elevation={2}
+          >
+            <Book sx={{ fontSize: 40 }} color="primary" />
+            <Box>
+              <Typography variant="h4" component="div">
+                {totalWords}
+              </Typography>
+              <Typography color="text.secondary">Total Words</Typography>
+            </Box>
+          </Paper>
+        </Grid>
+        <Grid colSpan={{ xs: 12, sm: 6, md: 4 }}>
+          <Paper
+            sx={{
+              p: 3,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              borderRadius: 2,
+              height: "100%",
+              minHeight: 120,
+            }}
+            elevation={2}
+          >
+            <School sx={{ fontSize: 40 }} color="success" />
+            <Box>
+              <Typography variant="h4" component="div">
+                {wordsLearned}
+              </Typography>
+              <Typography color="text.secondary">Words Mastered</Typography>
+            </Box>
+          </Paper>
+        </Grid>
+        <Grid colSpan={{ xs: 12, sm: 6, md: 4 }}>
+          <Paper
+            sx={{
+              p: 3,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              borderRadius: 2,
+              height: "100%",
+              minHeight: 120,
+            }}
+            elevation={2}
+          >
+            <Schedule sx={{ fontSize: 40 }} color="error" />
+            <Box>
+              <Typography variant="h4" component="div">
+                {wordsDueForReview}
+              </Typography>
+              <Typography color="text.secondary">Due for Review</Typography>
+            </Box>
+          </Paper>
+        </Grid>
       </Grid>
 
       {/* --- Manage Data Section --- */}
@@ -553,13 +775,12 @@ const Dashboard = () => {
         <Typography variant="h5" sx={{ mb: 2 }}>
           Manage Your Data
         </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          justifyContent="center"
+          alignItems="center"
+          sx={{ mb: 1 }}
         >
           <Button
             variant="outlined"
@@ -578,15 +799,18 @@ const Dashboard = () => {
             />
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
+            color="secondary"
             onClick={handleShowInfo}
-            startIcon={<Info />}
+            endIcon={<Info />}
+            sx={{ fontWeight: 500, px: 2.2 }}
           >
             Format Info
           </Button>
-        </Box>
+        </Stack>
       </Paper>
-      {/* --- Modal (no changes) --- */}
+
+      {/* --- Modal --- */}
       <InfoModal
         open={modalState.open}
         onClose={closeModal}
@@ -613,5 +837,4 @@ const Dashboard = () => {
     </Box>
   );
 };
-
 export default Dashboard;

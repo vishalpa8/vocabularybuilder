@@ -105,7 +105,45 @@ const QuizHistory = () => {
                   </IconButton>
                 </Tooltip>
               </Box>
-              <List dense>{/* ... your results map here ... */}</List>
+              <Box
+                sx={{
+                  maxHeight: 350,
+                  overflow: "auto",
+                  borderRadius: 1,
+                  bgcolor: "background.paper",
+                  // border: 1, borderColor: 'divider', // Optional: uncomment for a border
+                }}
+              >
+                <List dense>
+                  {(session.results || []).length === 0 ? (
+                    <ListItem>
+                      <ListItemText primary="No details recorded for this session." />
+                    </ListItem>
+                  ) : (
+                    session.results.map((result, i) => (
+                      <ListItem key={i}>
+                        <ListItemIcon sx={{ minWidth: 32 }}>
+                          {result.isCorrect ? (
+                            <CheckCircle color="success" fontSize="small" />
+                          ) : (
+                            <Cancel color="error" fontSize="small" />
+                          )}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={result.word?.word || ""}
+                          secondary={
+                            result.isCorrect
+                              ? "Correct"
+                              : `Your answer: ${
+                                  result.selectedAnswer
+                                } | Correct: ${result.word?.meaning || ""}`
+                          }
+                        />
+                      </ListItem>
+                    ))
+                  )}
+                </List>
+              </Box>
             </AccordionDetails>
           </Accordion>
         ))}
