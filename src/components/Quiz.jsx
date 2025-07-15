@@ -29,8 +29,6 @@ const Quiz = () => {
   const { words, updateWord } = useWords();
   const [quizWords, setQuizWords] = useState([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [isQuizComplete, setIsQuizComplete] = useState(false);
-  const [isQuizDataReady, setIsQuizDataReady] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
   const [options, setOptions] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -43,16 +41,22 @@ const Quiz = () => {
     message: "",
   });
 
+  // NEW: Handles showing the completion screen with feedback delay
+  const [showCompletion, setShowCompletion] = useState(false);
+
   // Fade transitions
   const [showMain, setShowMain] = useState(false);
   useEffect(() => {
     setShowMain(true);
   }, []);
 
+  // Quiz data ready
+  const [isQuizDataReady, setIsQuizDataReady] = useState(false);
   useEffect(() => {
     if (words !== undefined) setIsQuizDataReady(true);
   }, [words]);
 
+  // Generate MCQ options
   useEffect(() => {
     if (
       quizStarted &&
@@ -71,7 +75,7 @@ const Quiz = () => {
     setQuizResults([]);
     setIsAnswered(false);
     setSelectedAnswer(null);
-    setIsQuizComplete(false);
+    setShowCompletion(false);
     setQuizStarted(true);
   };
 
@@ -107,6 +111,7 @@ const Quiz = () => {
     }
   };
 
+  // ------- Main Fix Here ---------
   const handleAnswer = (answer) => {
     if (isAnswered) return;
 
@@ -138,10 +143,10 @@ const Quiz = () => {
         setIsAnswered(false);
         setSelectedAnswer(null);
       } else {
-        setIsQuizComplete(true);
-        setQuizStarted(false);
+        // LAST QUESTION — show feedback for 2.2s, then show complete
+        setShowCompletion(true);
 
-        // Save new session + remove history older than 30 days
+        // Save history
         const storedHistory = JSON.parse(
           localStorage.getItem("quizHistory") || "[]"
         );
@@ -158,17 +163,19 @@ const Quiz = () => {
           "quizHistory",
           JSON.stringify([newSession, ...recentHistory])
         );
+        setQuizStarted(false); // stop the quiz so it doesn't re-render
       }
-    }, 3200); // Extended feedback time to 3.2s
+    }, 1200);
   };
 
   const restartQuiz = () => {
-    setIsQuizComplete(false);
+    setShowCompletion(false);
     startQuiz();
   };
 
   const returnToQuizSetup = () => {
-    setIsQuizComplete(false);
+    setShowCompletion(false);
+    setQuizStarted(false);
   };
 
   // -- Render ---------------------------------------
@@ -181,7 +188,7 @@ const Quiz = () => {
     );
   }
 
-  if (isQuizComplete) {
+  if (showCompletion) {
     return (
       <Fade in={showMain}>
         <Box>
