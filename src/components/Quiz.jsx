@@ -25,11 +25,10 @@ import QuizComplete from "./quiz/QuizComplete";
 import QuizHistory from "./quiz/QuizHistory";
 import InfoModal from "./InfoModal";
 
-const FEEDBACK_TIME_MS = 600; // FAST feedback
-
 const Quiz = () => {
   const { words, updateWord } = useWords();
   const [quizWords, setQuizWords] = useState([]);
+  const [lastQuizWords, setLastQuizWords] = useState(null); // NEW: Track last quiz set
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
   const [isQuizDataReady, setIsQuizDataReady] = useState(false);
@@ -67,8 +66,10 @@ const Quiz = () => {
     }
   }, [quizStarted, quizWords, currentWordIndex, words]);
 
+  // START NEW QUIZ (random words & order)
   const proceedToStartQuiz = (wordsForQuiz) => {
     setQuizWords(wordsForQuiz);
+    setLastQuizWords(wordsForQuiz); // <-- Save for "start again"
     setCurrentWordIndex(0);
     setQuizResults([]);
     setIsAnswered(false);
@@ -109,7 +110,7 @@ const Quiz = () => {
     }
   };
 
-  // FAST feedback
+  // HANDLE ANSWER, FEEDBACK, AND ADVANCE
   const handleAnswer = (answer) => {
     if (isAnswered) return;
 
@@ -137,7 +138,7 @@ const Quiz = () => {
 
     setTimeout(() => {
       if (currentWordIndex < quizWords.length - 1) {
-        setCurrentWordIndex((prev) => prev + 1);
+        setCurrentWordIndex(currentWordIndex + 1);
         setIsAnswered(false);
         setSelectedAnswer(null);
       } else {
@@ -162,17 +163,31 @@ const Quiz = () => {
           JSON.stringify([newSession, ...recentHistory])
         );
       }
-    }, FEEDBACK_TIME_MS); // <<<< Much faster!
+    }, 1100); // Slightly faster feedback time
   };
 
+  // --- BUTTONS: START AGAIN / NEW QUIZ ---
+
+  // "Start Again" = same questions, reshuffle options each time!
   const restartQuiz = () => {
-    setIsQuizComplete(false);
-    startQuiz();
+    if (lastQuizWords) {
+      setQuizWords(lastQuizWords); // use same questions
+      setCurrentWordIndex(0);
+      setQuizResults([]);
+      setIsAnswered(false);
+      setSelectedAnswer(null);
+      setIsQuizComplete(false);
+      setQuizStarted(true);
+    } else {
+      startQuiz(); // fallback
+    }
   };
 
+  // "New Quiz" = randomize everything!
   const returnToQuizSetup = () => {
     setIsQuizComplete(false);
     setQuizStarted(false);
+    // next startQuiz() will pick a new random set
   };
 
   // -- Render ---------------------------------------
@@ -187,7 +202,7 @@ const Quiz = () => {
 
   if (isQuizComplete) {
     return (
-      <Fade in={showMain} timeout={200}>
+      <Fade in={showMain}>
         <Box>
           <QuizComplete
             results={quizResults}
@@ -202,7 +217,7 @@ const Quiz = () => {
   if (!quizStarted) {
     const totalWords = words ? words.length : 0;
     return (
-      <Fade in={showMain} timeout={200}>
+      <Fade in={showMain}>
         <Box>
           <Paper
             sx={{
@@ -276,7 +291,7 @@ const Quiz = () => {
   }
 
   return (
-    <Fade in={showMain} timeout={150}>
+    <Fade in={showMain}>
       <Box>
         <QuizMCQ
           currentWord={quizWords[currentWordIndex]}
