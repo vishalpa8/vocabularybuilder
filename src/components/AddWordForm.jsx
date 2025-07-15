@@ -14,8 +14,6 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import InputAdornment from "@mui/material/InputAdornment"; // <-- ADD THIS LINE
-
 import {
   TextFields as TextFieldsIcon,
   SpeakerNotes as SpeakerNotesIcon,
@@ -75,8 +73,8 @@ const AddWordForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormState((prevState) => ({ ...prevState, [name]: value }));
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    setFormState((prev) => ({ ...prev, [name]: value.trimStart() }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const showSnackbar = (message, severity) => {
@@ -239,6 +237,7 @@ const AddWordForm = () => {
               helperText={errors.word}
             />
           </Grid>
+
           {/* Part of Speech (unchanged) */}
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth variant="outlined" sx={{ minWidth: 160 }}>
@@ -258,6 +257,7 @@ const AddWordForm = () => {
               </Select>
             </FormControl>
           </Grid>
+
           {/* Meaning (required, icon, custom red star) */}
           <Grid item xs={12}>
             <TextField
@@ -317,6 +317,7 @@ const AddWordForm = () => {
               helperText="Use the word in a sentence to provide context."
             />
           </Grid>
+
           {/* Mnemonic (icon, no star) */}
           <Grid item xs={12}>
             <TextField
@@ -338,6 +339,7 @@ const AddWordForm = () => {
               helperText="A short rhyme, phrase, or association to help remember the word."
             />
           </Grid>
+
           {/* Tags (icon, no star) */}
           <Grid item xs={12}>
             <TextField
@@ -387,6 +389,7 @@ const AddWordForm = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
       <InfoModal
         open={modalState.open}
         onClose={handleCancelOverwrite}
@@ -398,5 +401,4 @@ const AddWordForm = () => {
     </>
   );
 };
-
 export default AddWordForm;
