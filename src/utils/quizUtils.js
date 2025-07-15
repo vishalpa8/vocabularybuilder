@@ -30,11 +30,13 @@ export function filterOldHistory(history, days = 30) {
 export const getWordsForQuiz = (words, limit) => {
   if (!words || words.length === 0) return [];
 
-  // Shuffle all words
-  const shuffledWords = [...words].sort(() => 0.5 - Math.random());
+  // Filter for unlearned words that are due for review
+  const dueForReview = words
+    .filter((word) => !word.isLearned && new Date(word.nextReview) <= new Date())
+    .sort(() => 0.5 - Math.random()); // Shuffle due words
 
   // Return the requested number of words
-  return shuffledWords.slice(0, limit);
+  return dueForReview.slice(0, limit);
 };
 
 export const generateOptions = (correctWord, allWords) => {

@@ -1,7 +1,7 @@
 import React from "react";
 import { useWords } from "../hooks/useWords";
 import WordCard from "./WordCard";
-import { Grid, Typography, Box, CircularProgress } from "@mui/material";
+import { Typography, Box, CircularProgress } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 const WordList = ({

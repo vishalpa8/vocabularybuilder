@@ -28,7 +28,7 @@ import {
 } from "@mui/icons-material";
 import InfoModal from "./InfoModal";
 import { downloadJson, uploadJson } from "../utils/fileUtils";
-import { areWordContentsEqual, normalizeWordKey } from "../utils/wordUtils";
+import { normalizeWordKey } from "../utils/wordUtils";
 
 // Example JSON for Format Info (and copy)
 const exampleJSON = `[
@@ -64,7 +64,6 @@ const Dashboard = () => {
   });
   const [fileToImport, setFileToImport] = useState(null);
   const [wordsToOverwrite, setWordsToOverwrite] = useState([]);
-  const [identicalWords, setIdenticalWords] = useState([]);
   const [copied, setCopied] = useState(false); // for copy feedback
 
   // Export words to JSON
@@ -147,7 +146,9 @@ const Dashboard = () => {
                         await navigator.clipboard.writeText(exampleJSON);
                         setCopied(true);
                         setTimeout(() => setCopied(false), 1500);
-                      } catch {}
+                      } catch {
+                        // ignore
+                      }
                     }}
                     sx={{
                       position: "absolute",
@@ -267,21 +268,19 @@ const Dashboard = () => {
       importedWords.forEach((word, index) => {
         const missingFields = [];
         if (!word.word || typeof word.word !== "string" || !word.word.trim())
-          missingFields.push('"word" (string, required)');
+          missingFields.push('&quot;word&quot; (string, required)');
         if (
           !word.meaning ||
           typeof word.meaning !== "string" ||
           !word.meaning.trim()
         )
-          missingFields.push('"meaning" (string, required)');
+          missingFields.push('&quot;meaning&quot; (string, required)');
         if (
           word.tags &&
           !Array.isArray(word.tags) &&
           typeof word.tags !== "string"
         )
-          missingFields.push(
-            '"tags" (should be array or comma-separated string)'
-          );
+          missingFields.push('&quot;tags&quot; (should be array or comma-separated string)');
         if (missingFields.length > 0) {
           validationErrors.push(
             `Entry ${index + 1} (word: ${
@@ -308,7 +307,7 @@ const Dashboard = () => {
                 ))}
               </ul>
               <Typography>
-                Please ensure each word has valid "word" and "meaning"
+                Please ensure each word has valid &quot;word&quot; and &quot;meaning&quot;
                 properties.
               </Typography>
             </Box>
@@ -326,7 +325,7 @@ const Dashboard = () => {
           title: "Import Warning",
           message: (
             <Typography>
-              You're trying to import {importedWords.length} words at once. For
+              You&apos;re trying to import {importedWords.length} words at once. For
               best performance, consider importing smaller batches.
             </Typography>
           ),
@@ -343,34 +342,25 @@ const Dashboard = () => {
         words.map((w) => [normalizeWordKey(w), w])
       );
       const newWords = [];
-      const identical = [];
       const conflicting = [];
 
       for (const iw of importedWords) {
         const key = normalizeWordKey(iw);
         const ew = existingWordMap.get(key);
         if (ew) {
-          if (areWordContentsEqual(ew, iw)) {
-            identical.push(iw);
-          } else {
-            conflicting.push(iw);
-          }
+          conflicting.push(iw);
         } else {
           newWords.push(iw);
         }
       }
 
       // All identical
-      if (
-        newWords.length === 0 &&
-        conflicting.length === 0 &&
-        identical.length > 0
-      ) {
+      if (newWords.length === 0 && conflicting.length === 0) {
         setModalState({
           open: true,
           title: "Nothing to Import",
           message:
-            "All words in the imported file already exist and are identical. No changes needed.",
+            "All words in the imported file already exist. No changes needed.",
           type: "info",
         });
         return;
@@ -397,7 +387,6 @@ const Dashboard = () => {
       if (conflicting.length === importedWords.length) {
         setFileToImport([]);
         setWordsToOverwrite(conflicting);
-        setIdenticalWords([]);
         setModalState({
           open: true,
           title: "Import Conflicts",
@@ -439,7 +428,6 @@ const Dashboard = () => {
       // Mix of new/identical/conflicting
       setFileToImport(newWords);
       setWordsToOverwrite(conflicting);
-      setIdenticalWords(identical);
 
       let messageContent = (
         <Box sx={{ textAlign: "left" }}>
@@ -482,34 +470,6 @@ const Dashboard = () => {
               >
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                   {conflicting.map((w) => (
-                    <Chip key={w.word} label={w.word} />
-                  ))}
-                </Box>
-              </Paper>
-            </>
-          )}
-          {identical.length > 0 && (
-            <>
-              <Typography
-                sx={{
-                  mt: newWords.length > 0 || conflicting.length > 0 ? 2 : 0,
-                }}
-              >
-                The following word(s) already exist and are identical (will be
-                skipped):
-              </Typography>
-              <Paper
-                variant="outlined"
-                sx={{
-                  maxHeight: 100,
-                  overflow: "auto",
-                  my: 1,
-                  p: 1,
-                  background: (theme) => theme.palette.grey[100],
-                }}
-              >
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  {identical.map((w) => (
                     <Chip key={w.word} label={w.word} />
                   ))}
                 </Box>
@@ -591,7 +551,6 @@ const Dashboard = () => {
     } finally {
       setFileToImport(null);
       setWordsToOverwrite([]);
-      setIdenticalWords([]);
     }
   };
 
@@ -620,7 +579,6 @@ const Dashboard = () => {
     } finally {
       setFileToImport(null);
       setWordsToOverwrite([]);
-      setIdenticalWords([]);
     }
   };
 
@@ -635,7 +593,6 @@ const Dashboard = () => {
     });
     setFileToImport(null);
     setWordsToOverwrite([]);
-    setIdenticalWords([]);
   };
 
   if (!words) {
@@ -653,7 +610,7 @@ const Dashboard = () => {
   ).length;
 
   const StatCard = ({ title, value, icon }) => (
-    <Grid colSpan={{ xs: 12, sm: 6, md: 4 }}>
+    <Grid item xs={12} sm={6} md={4}>
       <Paper
         sx={{
           p: 3,
@@ -663,12 +620,17 @@ const Dashboard = () => {
           borderRadius: 2,
           height: "100%",
           minHeight: 120,
+          transition: "transform 0.2s, box-shadow 0.2s",
+          "&:hover": {
+            transform: "translateY(-4px)",
+            boxShadow: (theme) => theme.shadows[4],
+          },
         }}
         elevation={2}
       >
         {icon}
         <Box>
-          <Typography variant="h4" component="div">
+          <Typography variant="h4" component="div" fontWeight="bold">
             {value}
           </Typography>
           <Typography color="text.secondary">{title}</Typography>
@@ -682,7 +644,6 @@ const Dashboard = () => {
       {/* --- Stats Cards Row --- */}
       <Grid
         container
-        columns={12}
         spacing={3}
         sx={{
           mb: 3,
@@ -692,72 +653,21 @@ const Dashboard = () => {
           justifyContent: "center",
         }}
       >
-        <Grid colSpan={{ xs: 12, sm: 6, md: 4 }}>
-          <Paper
-            sx={{
-              p: 3,
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              borderRadius: 2,
-              height: "100%",
-              minHeight: 120,
-            }}
-            elevation={2}
-          >
-            <Book sx={{ fontSize: 40 }} color="primary" />
-            <Box>
-              <Typography variant="h4" component="div">
-                {totalWords}
-              </Typography>
-              <Typography color="text.secondary">Total Words</Typography>
-            </Box>
-          </Paper>
-        </Grid>
-        <Grid colSpan={{ xs: 12, sm: 6, md: 4 }}>
-          <Paper
-            sx={{
-              p: 3,
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              borderRadius: 2,
-              height: "100%",
-              minHeight: 120,
-            }}
-            elevation={2}
-          >
-            <School sx={{ fontSize: 40 }} color="success" />
-            <Box>
-              <Typography variant="h4" component="div">
-                {wordsLearned}
-              </Typography>
-              <Typography color="text.secondary">Words Mastered</Typography>
-            </Box>
-          </Paper>
-        </Grid>
-        <Grid colSpan={{ xs: 12, sm: 6, md: 4 }}>
-          <Paper
-            sx={{
-              p: 3,
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              borderRadius: 2,
-              height: "100%",
-              minHeight: 120,
-            }}
-            elevation={2}
-          >
-            <Schedule sx={{ fontSize: 40 }} color="error" />
-            <Box>
-              <Typography variant="h4" component="div">
-                {wordsDueForReview}
-              </Typography>
-              <Typography color="text.secondary">Due for Review</Typography>
-            </Box>
-          </Paper>
-        </Grid>
+        <StatCard
+          title="Total Words"
+          value={totalWords}
+          icon={<Book sx={{ fontSize: 40 }} color="primary" />}
+        />
+        <StatCard
+          title="Words Mastered"
+          value={wordsLearned}
+          icon={<School sx={{ fontSize: 40 }} color="success" />}
+        />
+        <StatCard
+          title="Due for Review"
+          value={wordsDueForReview}
+          icon={<Schedule sx={{ fontSize: 40 }} color="error" />}
+        />
       </Grid>
 
       {/* --- Manage Data Section --- */}

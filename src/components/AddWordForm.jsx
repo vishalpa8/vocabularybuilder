@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useWords } from "../hooks/useWords";
 import {
   TextField,
@@ -126,6 +126,7 @@ const AddWordForm = () => {
       try {
         importedWordsRaw = await uploadJson(file);
       } catch (err) {
+        console.error(err);
         setModalState({
           open: true,
           title: "Import Failed",
@@ -175,7 +176,7 @@ const AddWordForm = () => {
         message: (
           <Box>
             <Typography>
-              The imported data contains duplicate words:{" "}
+              The imported data contains duplicate words:{}{" "}
               <b>{dupWords.join(", ")}</b>.<br />
               Remove duplicates and try again.
             </Typography>
@@ -192,20 +193,20 @@ const AddWordForm = () => {
     importedWords.forEach((word, index) => {
       const missingFields = [];
       if (!word.word || typeof word.word !== "string" || !word.word.trim())
-        missingFields.push('"word" (string, required)');
+        missingFields.push("&quot;word&quot; (string, required)");
       if (
         !word.meaning ||
         typeof word.meaning !== "string" ||
         !word.meaning.trim()
       )
-        missingFields.push('"meaning" (string, required)');
+        missingFields.push("&quot;meaning&quot; (string, required)");
       if (
         word.tags &&
         !Array.isArray(word.tags) &&
         typeof word.tags !== "string"
       )
         missingFields.push(
-          '"tags" (should be array or comma-separated string)'
+          "&apos;tags&apos; (should be array or comma-separated string)"
         );
       if (missingFields.length > 0) {
         validationErrors.push(
@@ -233,7 +234,8 @@ const AddWordForm = () => {
               ))}
             </ul>
             <Typography>
-              Please ensure each word has valid "word" and "meaning" properties.
+              Please ensure each word has valid &quot;word&quot; and
+              &quot;meaning&quot; properties.
             </Typography>
           </Box>
         ),
@@ -250,8 +252,8 @@ const AddWordForm = () => {
         title: "Import Warning",
         message: (
           <Typography>
-            You're trying to import {importedWords.length} words at once. For
-            best performance, consider importing smaller batches.
+            You&apos;re trying to import {importedWords.length} words at once.
+            For best performance, consider importing smaller batches.
           </Typography>
         ),
         type: "info",
@@ -514,14 +516,14 @@ const AddWordForm = () => {
         const equal = areWordContentsEqual(existingWord, currentFormData);
         if (equal) {
           showSnackbar(
-            `The word "${formState.word}" is already present in your vocabulary.`,
+            `The word &quot;${formState.word}&quot; is already present in your vocabulary.`,
             "info"
           );
         } else {
           setModalState({
             open: true,
             title: "Word Already Exists",
-            message: `The word "${formState.word}" already exists in your vocabulary with different details. Do you want to update its details?`,
+            message: `The word &quot;${formState.word}&quot; already exists in your vocabulary with different details. Do you want to update its details?`,
             type: "confirm",
             data: { existingWordId: existingWord.id, newWordData: formState },
           });
@@ -642,7 +644,7 @@ const AddWordForm = () => {
           </Grid>
         </Grid>
         <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
-          Context & Memory Aids
+          Context &amp; Memory Aids
         </Typography>
         <Divider sx={{ mb: 3 }} />
         <Grid container spacing={3}>
@@ -771,6 +773,7 @@ const AddWordForm = () => {
                   });
                 }
               } catch (err) {
+                console.error(err);
                 setModalState({
                   open: true,
                   title: "Error",
