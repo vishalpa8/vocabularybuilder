@@ -25,10 +25,14 @@ import QuizComplete from "./quiz/QuizComplete";
 import QuizHistory from "./quiz/QuizHistory";
 import InfoModal from "./InfoModal";
 
+const FEEDBACK_TIME_MS = 600; // FAST feedback
+
 const Quiz = () => {
   const { words, updateWord } = useWords();
   const [quizWords, setQuizWords] = useState([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isQuizComplete, setIsQuizComplete] = useState(false);
+  const [isQuizDataReady, setIsQuizDataReady] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
   const [options, setOptions] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -41,22 +45,16 @@ const Quiz = () => {
     message: "",
   });
 
-  // NEW: Handles showing the completion screen with feedback delay
-  const [showCompletion, setShowCompletion] = useState(false);
-
   // Fade transitions
   const [showMain, setShowMain] = useState(false);
   useEffect(() => {
     setShowMain(true);
   }, []);
 
-  // Quiz data ready
-  const [isQuizDataReady, setIsQuizDataReady] = useState(false);
   useEffect(() => {
     if (words !== undefined) setIsQuizDataReady(true);
   }, [words]);
 
-  // Generate MCQ options
   useEffect(() => {
     if (
       quizStarted &&
@@ -75,7 +73,7 @@ const Quiz = () => {
     setQuizResults([]);
     setIsAnswered(false);
     setSelectedAnswer(null);
-    setShowCompletion(false);
+    setIsQuizComplete(false);
     setQuizStarted(true);
   };
 
@@ -111,7 +109,7 @@ const Quiz = () => {
     }
   };
 
-  // ------- Main Fix Here ---------
+  // FAST feedback
   const handleAnswer = (answer) => {
     if (isAnswered) return;
 
@@ -139,14 +137,14 @@ const Quiz = () => {
 
     setTimeout(() => {
       if (currentWordIndex < quizWords.length - 1) {
-        setCurrentWordIndex(currentWordIndex + 1);
+        setCurrentWordIndex((prev) => prev + 1);
         setIsAnswered(false);
         setSelectedAnswer(null);
       } else {
-        // LAST QUESTION — show feedback for 2.2s, then show complete
-        setShowCompletion(true);
+        setIsQuizComplete(true);
+        setQuizStarted(false);
 
-        // Save history
+        // Save new session + remove history older than 30 days
         const storedHistory = JSON.parse(
           localStorage.getItem("quizHistory") || "[]"
         );
@@ -163,18 +161,17 @@ const Quiz = () => {
           "quizHistory",
           JSON.stringify([newSession, ...recentHistory])
         );
-        setQuizStarted(false); // stop the quiz so it doesn't re-render
       }
-    }, 1200);
+    }, FEEDBACK_TIME_MS); // <<<< Much faster!
   };
 
   const restartQuiz = () => {
-    setShowCompletion(false);
+    setIsQuizComplete(false);
     startQuiz();
   };
 
   const returnToQuizSetup = () => {
-    setShowCompletion(false);
+    setIsQuizComplete(false);
     setQuizStarted(false);
   };
 
@@ -188,9 +185,9 @@ const Quiz = () => {
     );
   }
 
-  if (showCompletion) {
+  if (isQuizComplete) {
     return (
-      <Fade in={showMain}>
+      <Fade in={showMain} timeout={200}>
         <Box>
           <QuizComplete
             results={quizResults}
@@ -205,7 +202,7 @@ const Quiz = () => {
   if (!quizStarted) {
     const totalWords = words ? words.length : 0;
     return (
-      <Fade in={showMain}>
+      <Fade in={showMain} timeout={200}>
         <Box>
           <Paper
             sx={{
@@ -279,7 +276,7 @@ const Quiz = () => {
   }
 
   return (
-    <Fade in={showMain}>
+    <Fade in={showMain} timeout={150}>
       <Box>
         <QuizMCQ
           currentWord={quizWords[currentWordIndex]}
