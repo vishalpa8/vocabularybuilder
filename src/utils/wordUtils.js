@@ -25,6 +25,18 @@ export function cleanUpdateObject(obj) {
   return cleaned;
 }
 
+export const parsePastedJson = (str) => {
+  try {
+    const json = JSON.parse(str);
+    return { success: true, data: json };
+  } catch {
+    return {
+      success: false,
+      error: "Invalid JSON format. Please check your pasted data.",
+    };
+  }
+};
+
 // Convert value to array of trimmed strings (handles array or comma-separated string, or undefined/null)
 function toArr(val) {
   if (Array.isArray(val))
