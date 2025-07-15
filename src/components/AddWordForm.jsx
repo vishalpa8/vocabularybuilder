@@ -11,10 +11,11 @@ import {
   InputLabel,
   Snackbar,
   Alert,
-  InputAdornment,
   Typography,
   Divider,
 } from "@mui/material";
+import InputAdornment from "@mui/material/InputAdornment"; // <-- ADD THIS LINE
+
 import {
   TextFields as TextFieldsIcon,
   SpeakerNotes as SpeakerNotesIcon,
@@ -208,27 +209,38 @@ const AddWordForm = () => {
         </Typography>
         <Divider sx={{ mb: 3 }} />
         <Grid container spacing={3}>
-          <Grid colSpan={{ xs: 12, sm: 6 }}>
+          {/* Word (required, icon, custom red star) */}
+          <Grid item xs={12} sm={6}>
             <TextField
               name="word"
-              label="Word"
-              variant="outlined"
+              label={
+                <span>
+                  <TextFieldsIcon
+                    fontSize="small"
+                    style={{ verticalAlign: "middle", marginRight: 4 }}
+                  />
+                  Word
+                  <span
+                    style={{
+                      color: "#d32f2f",
+                      marginLeft: 6,
+                      fontWeight: 700,
+                      fontSize: "1.1em",
+                    }}
+                  >
+                    *
+                  </span>
+                </span>
+              }
               value={formState.word}
               onChange={handleChange}
-              required
               fullWidth
               error={!!errors.word}
               helperText={errors.word}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <TextFieldsIcon />
-                  </InputAdornment>
-                ),
-              }}
             />
           </Grid>
-          <Grid colSpan={{ xs: 12, sm: 6 }}>
+          {/* Part of Speech (unchanged) */}
+          <Grid item xs={12} sm={6}>
             <FormControl fullWidth variant="outlined" sx={{ minWidth: 160 }}>
               <InputLabel id="part-of-speech-label">Part of Speech</InputLabel>
               <Select
@@ -246,24 +258,34 @@ const AddWordForm = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid colSpan={12}>
+          {/* Meaning (required, icon, custom red star) */}
+          <Grid item xs={12}>
             <TextField
               name="meaning"
-              label="Meaning"
-              variant="outlined"
+              label={
+                <span>
+                  <SpeakerNotesIcon
+                    fontSize="small"
+                    style={{ verticalAlign: "middle", marginRight: 4 }}
+                  />
+                  Meaning
+                  <span
+                    style={{
+                      color: "#d32f2f",
+                      marginLeft: 6,
+                      fontWeight: 700,
+                      fontSize: "1.1em",
+                    }}
+                  >
+                    *
+                  </span>
+                </span>
+              }
               value={formState.meaning}
               onChange={handleChange}
-              required
               fullWidth
               error={!!errors.meaning}
               helperText={errors.meaning}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SpeakerNotesIcon />
-                  </InputAdornment>
-                ),
-              }}
             />
           </Grid>
         </Grid>
@@ -274,62 +296,65 @@ const AddWordForm = () => {
         <Divider sx={{ mb: 3 }} />
 
         <Grid container spacing={3}>
-          <Grid colSpan={12}>
+          {/* Sample Sentence (icon, no star) */}
+          <Grid item xs={12}>
             <TextField
               name="sampleSentence"
-              label="Sample Sentence"
-              variant="outlined"
-              multiline
-              minRows={3}
+              label={
+                <span>
+                  <FormatQuoteIcon
+                    fontSize="small"
+                    style={{ verticalAlign: "middle", marginRight: 4 }}
+                  />
+                  Sample Sentence
+                </span>
+              }
               value={formState.sampleSentence}
               onChange={handleChange}
               fullWidth
-              helperText="Use the word in a sentence to provide context."
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FormatQuoteIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid colSpan={12}>
-            <TextField
-              name="mnemonic"
-              label="Mnemonic (optional)"
-              variant="outlined"
               multiline
               minRows={3}
+              helperText="Use the word in a sentence to provide context."
+            />
+          </Grid>
+          {/* Mnemonic (icon, no star) */}
+          <Grid item xs={12}>
+            <TextField
+              name="mnemonic"
+              label={
+                <span>
+                  <LightbulbIcon
+                    fontSize="small"
+                    style={{ verticalAlign: "middle", marginRight: 4 }}
+                  />
+                  Mnemonic (optional)
+                </span>
+              }
               value={formState.mnemonic}
               onChange={handleChange}
               fullWidth
+              multiline
+              minRows={3}
               helperText="A short rhyme, phrase, or association to help remember the word."
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LightbulbIcon />
-                  </InputAdornment>
-                ),
-              }}
             />
           </Grid>
-          <Grid colSpan={12}>
+          {/* Tags (icon, no star) */}
+          <Grid item xs={12}>
             <TextField
               name="tags"
-              label="Tags (comma-separated)"
-              variant="outlined"
+              label={
+                <span>
+                  <LocalOfferIcon
+                    fontSize="small"
+                    style={{ verticalAlign: "middle", marginRight: 4 }}
+                  />
+                  Tags (comma-separated)
+                </span>
+              }
               value={formState.tags}
               onChange={handleChange}
               fullWidth
               helperText="e.g., 'work', 'science', 'literature'"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LocalOfferIcon />
-                  </InputAdornment>
-                ),
-              }}
             />
           </Grid>
         </Grid>
@@ -345,6 +370,8 @@ const AddWordForm = () => {
           </Button>
         </Box>
       </Box>
+
+      {/* Snackbar, InfoModal etc. */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}
@@ -371,4 +398,5 @@ const AddWordForm = () => {
     </>
   );
 };
+
 export default AddWordForm;
