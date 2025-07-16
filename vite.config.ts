@@ -21,7 +21,9 @@ export default defineConfig({
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               },
-              cacheKeyWillBeUsed: async ({ request }) => `${request.url}`,
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
             },
           },
           {
