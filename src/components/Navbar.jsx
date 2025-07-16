@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   AppBar,
@@ -25,7 +25,7 @@ import {
   Brightness7,
   Menu as MenuIcon,
 } from "@mui/icons-material";
-import { useThemeContext } from "../hooks/useThemeContext";
+import { useThemeContext } from "../contexts/ThemeContext.jsx";
 import { useTheme } from "@mui/material/styles";
 
 const navItems = [
@@ -70,10 +70,10 @@ const Navbar = () => {
     },
   });
 
-  const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
+  const handleDrawerToggle = useCallback(() => setDrawerOpen(!drawerOpen), [drawerOpen]);
 
-  // Drawer content for mobile
-  const drawerContent = (
+  // Memoize drawer content for mobile
+  const drawerContent = useMemo(() => (
     <Box
       sx={{ width: 250, p: 2 }}
       role="presentation"
@@ -138,7 +138,7 @@ const Navbar = () => {
         ))}
       </List>
     </Box>
-  );
+  ), [location.pathname, theme, handleDrawerToggle]);
 
   return (
     <>

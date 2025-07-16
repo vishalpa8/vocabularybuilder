@@ -1,17 +1,25 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material';
+import { ThemeProvider as MuiThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import getTheme from './theme';
-import { CustomThemeProvider } from './contexts/ThemeContext.jsx';
-import { useThemeContext } from './hooks/useThemeContext';
+import { CustomThemeProvider, useThemeContext } from './contexts/ThemeContext.jsx';
 import Layout from './components/Layout';
-import HomePage from './pages/HomePage';
-import AddWordPage from './pages/AddWordPage';
-import QuizPage from './pages/QuizPage';
-import DashboardPage from './pages/DashboardPage';
+
+// Lazy load pages
+const HomePage = React.lazy(() => import('./pages/HomePage'));
+const AddWordPage = React.lazy(() => import('./pages/AddWordPage'));
+const QuizPage = React.lazy(() => import('./pages/QuizPage'));
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+    <CircularProgress />
+  </Box>
+);
 
 const router = createBrowserRouter([
   {
@@ -20,19 +28,35 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <HomePage />,
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <HomePage />
+          </Suspense>
+        ),
       },
       {
         path: "add",
-        element: <AddWordPage />,
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <AddWordPage />
+          </Suspense>
+        ),
       },
       {
         path: "quiz",
-        element: <QuizPage />,
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <QuizPage />
+          </Suspense>
+        ),
       },
       {
         path: "dashboard",
-        element: <DashboardPage />,
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <DashboardPage />
+          </Suspense>
+        ),
       },
     ],
   },

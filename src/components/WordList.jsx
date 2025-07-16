@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useWords } from "../hooks/useWords";
 import WordCard from "./WordCard";
 import { Typography, Box, CircularProgress } from "@mui/material";
@@ -11,40 +11,47 @@ const WordList = ({
 }) => {
   const { words } = useWords();
 
+  // Memoize filtered words for performance
+  const { filteredWords, emptyMsg } = useMemo(() => {
+    if (!words) return { filteredWords: [], emptyMsg: "No Words Found" };
+
+    let filtered = words;
+
+    if (showFavourites) {
+      filtered = filtered.filter((word) => !!word.isFavorite);
+    }
+
+    if (selectedTag) {
+      filtered = filtered.filter(
+        (word) => Array.isArray(word.tags) && word.tags.includes(selectedTag)
+      );
+    }
+
+    const search = searchTerm.trim().toLowerCase();
+    if (search) {
+      filtered = filtered.filter((word) =>
+        (word.word || "").toLowerCase().includes(search)
+      );
+    }
+
+    let message = "No Words Found";
+    if (showFavourites && selectedTag) {
+      message = `No Favourites with tag "${selectedTag}"`;
+    } else if (showFavourites) {
+      message = "No Favourites Yet!";
+    } else if (selectedTag) {
+      message = `No Words Found for tag "${selectedTag}"`;
+    }
+
+    return { filteredWords: filtered, emptyMsg: message };
+  }, [words, searchTerm, showFavourites, selectedTag]);
+
   if (typeof words === "undefined") {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
         <CircularProgress />
       </Box>
     );
-  }
-
-  let filteredWords = words;
-
-  if (showFavourites) {
-    filteredWords = filteredWords.filter((word) => !!word.isFavorite);
-  }
-
-  if (selectedTag) {
-    filteredWords = filteredWords.filter(
-      (word) => Array.isArray(word.tags) && word.tags.includes(selectedTag)
-    );
-  }
-
-  const search = searchTerm.trim().toLowerCase();
-  if (search) {
-    filteredWords = filteredWords.filter((word) =>
-      (word.word || "").toLowerCase().includes(search)
-    );
-  }
-
-  let emptyMsg = "No Words Found";
-  if (showFavourites && selectedTag) {
-    emptyMsg = `No Favourites with tag "${selectedTag}"`;
-  } else if (showFavourites) {
-    emptyMsg = "No Favourites Yet!";
-  } else if (selectedTag) {
-    emptyMsg = `No Words Found for tag "${selectedTag}"`;
   }
 
   if (filteredWords.length === 0) {
@@ -61,7 +68,7 @@ const WordList = ({
         <AddCircleOutlineIcon sx={{ fontSize: 48, color: "grey.500", mb: 2 }} />
         <Typography variant="h6">{emptyMsg}</Typography>
         <Typography color="text.secondary">
-          {search
+          {searchTerm.trim()
             ? "Try a different search term"
             : showFavourites
             ? "Mark words as favourite to see them here."

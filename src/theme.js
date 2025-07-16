@@ -89,18 +89,47 @@ const getTheme = (mode) => createTheme({
           borderRadius: theme.shape.borderRadius * 2,
           boxShadow: 'none',
           border: `1px solid ${theme.palette.divider}`,
+          '&:focus-within': {
+            outline: `2px solid ${theme.palette.primary.main}`,
+            outlineOffset: '2px',
+          },
         }),
       },
     },
     MuiButton: {
-        styleOverrides: {
-            root: {
-                textTransform: 'none',
-                fontWeight: 600,
-                borderRadius: '9999px',
-            }
-        }
-    }
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          fontWeight: 600,
+          borderRadius: '9999px',
+          '&:focus-visible': {
+            outline: '2px solid',
+            outlineOffset: '2px',
+          },
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderWidth: '2px',
+            },
+          },
+        },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          '&:focus-visible': {
+            outline: '2px solid',
+            outlineOffset: '2px',
+          },
+        },
+      },
+    },
   },
 });
 

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import WordList from "../components/WordList";
+import VirtualWordList from "../components/VirtualWordList";
 import WordOfTheDay from "../components/WordOfTheDay";
 import {
   TextField,
@@ -18,6 +19,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ListIcon from "@mui/icons-material/List";
 import { useWords } from "../hooks/useWords";
+import { useDebounce } from "../hooks/usePerformanceMonitor";
 
 const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,16 +27,25 @@ const HomePage = () => {
   const [selectedTag, setSelectedTag] = useState("");
   const { words } = useWords();
 
-  // Gather unique tags
-  const allTags = words
-    ? Array.from(
-        new Set(
-          words
-            .flatMap((w) => w.tags || [])
-            .filter((tag) => tag && tag.trim() !== "")
-        )
+  // Debounce search term to improve performance
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  // Memoize unique tags calculation
+  const allTags = useMemo(() => {
+    if (!words) return [];
+    return Array.from(
+      new Set(
+        words
+          .flatMap((w) => w.tags || [])
+          .filter((tag) => tag && tag.trim() !== "")
       )
-    : [];
+    );
+  }, [words]);
+
+  // Determine if we should use virtual scrolling (for lists > 50 items)
+  const shouldUseVirtualScrolling = useMemo(() => {
+    return words && words.length > 50;
+  }, [words]);
 
   return (
     <Box>
@@ -124,11 +135,20 @@ const HomePage = () => {
           }}
         />
       </Box>
-      <WordList
-        searchTerm={searchTerm}
-        showFavourites={showFavourites}
-        selectedTag={selectedTag}
-      />
+      {shouldUseVirtualScrolling ? (
+        <VirtualWordList
+          words={words}
+          searchTerm={debouncedSearchTerm}
+          showFavourites={showFavourites}
+          selectedTag={selectedTag}
+        />
+      ) : (
+        <WordList
+          searchTerm={debouncedSearchTerm}
+          showFavourites={showFavourites}
+          selectedTag={selectedTag}
+        />
+      )}
     </Box>
   );
 };

@@ -7,7 +7,16 @@ import {
   LinearProgress,
   Paper,
   Stack,
+  Fade,
+  Zoom,
+  Chip,
 } from "@mui/material";
+import { 
+  CheckCircle,
+  Cancel,
+  Lightbulb,
+  Psychology,
+} from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 
 
@@ -122,72 +131,211 @@ const QuizMCQ = ({
   };
 
   return (
-    <Box>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <Box sx={{ width: "100%", mr: 1 }}>
-          <LinearProgress
-            variant="determinate"
-            value={progress || 0}
-            sx={{ borderRadius: 1 }}
+    <Fade in>
+      <Box>
+        {/* Progress and Question Counter */}
+        <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+          <Box sx={{ width: "100%", mr: 2 }}>
+            <LinearProgress
+              variant="determinate"
+              value={progress || 0}
+              sx={{ 
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: theme.palette.action.hover,
+                '& .MuiLinearProgress-bar': {
+                  background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                  borderRadius: 4,
+                }
+              }}
+            />
+          </Box>
+          <Chip
+            label={`${currentQuestion || 1}/${totalQuestions || 1}`}
+            size="small"
+            sx={{ 
+              fontWeight: 600,
+              background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+              color: 'white'
+            }}
           />
         </Box>
-        <Box sx={{ minWidth: 35 }}>
-          <Typography variant="body2" color="text.secondary">
-            {`${currentQuestion || 1}/${totalQuestions || 1}`}
-          </Typography>
-        </Box>
-      </Box>
-      <Card elevation={3} sx={{ mb: 3, borderRadius: 2 }}>
-        <CardContent
-          sx={{
-            minHeight: 140, // Increased height for better visual balance
-            display: "flex",
-            flexDirection: "column", // Allow content to stack if needed
-            justifyContent: "center",
-            alignItems: "center",
-            p: { xs: 2, sm: 3 }, // Add padding
-          }}
-        >
-          <Typography
-            variant="h4"
-            component="div"
-            sx={{
-              textAlign: "center",
-              fontWeight: 700,
-              color: "primary.main",
-              wordBreak: "break-word",
-              lineHeight: 1.3, // Adjust line height for better readability
+
+        {/* Question Card */}
+        <Zoom in style={{ transitionDelay: '100ms' }}>
+          <Card 
+            elevation={6} 
+            sx={{ 
+              mb: 4, 
+              borderRadius: 3,
+              background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)',
+              border: '1px solid rgba(102, 126, 234, 0.1)',
+              position: 'relative',
+              overflow: 'visible'
             }}
           >
-            {question}
-          </Typography>
-        </CardContent>
-      </Card>
-      <Stack spacing={1.5} sx={{ mt: 2 }}>
-        {options.map((option, idx) => (
-          <Paper
-            key={getOptionKey(option, idx)}
-            elevation={
-              isAnswered &&
-              (option === correctAnswer || option === selectedAnswer)
-                ? 2
-                : 1
-            }
-            component="button"
-            role="button"
-            tabIndex={isAnswered ? -1 : 0}
-            aria-disabled={isAnswered}
-            sx={getOptionCardStyle(option)}
-            onClick={!isAnswered ? () => handleAnswer(option) : undefined}
-            onKeyDown={
-              !isAnswered ? (e) => handleOptionKeyDown(option, e) : undefined
-            }
-          >
-            {option}
-          </Paper>
-        ))}
-      </Stack>
-    </Box>
+            <CardContent
+              sx={{
+                minHeight: 160,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                p: { xs: 3, sm: 4 },
+                position: 'relative'
+              }}
+            >
+              <Box sx={{ 
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1
+              }}>
+                <Psychology sx={{ fontSize: 20, color: 'primary.main' }} />
+                <Typography variant="caption" color="primary.main" sx={{ fontWeight: 600 }}>
+                  {isWordToMeaning ? 'Find the meaning' : 'Find the word'}
+                </Typography>
+              </Box>
+              
+              <Typography
+                variant="h3"
+                component="div"
+                sx={{
+                  textAlign: "center",
+                  fontWeight: 700,
+                  background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                  wordBreak: "break-word",
+                  lineHeight: 1.2,
+                  mb: 1
+                }}
+              >
+                {question}
+              </Typography>
+              
+              {currentWord.partOfSpeech && (
+                <Chip
+                  label={currentWord.partOfSpeech}
+                  size="small"
+                  variant="outlined"
+                  sx={{ 
+                    mt: 1,
+                    borderColor: 'primary.main',
+                    color: 'primary.main',
+                    fontWeight: 500
+                  }}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </Zoom>
+
+        {/* Options */}
+        <Stack spacing={2} sx={{ mt: 2 }}>
+          {options.map((option, idx) => {
+            const isCorrectAnswer = option === correctAnswer;
+            const isSelectedAnswer = option === selectedAnswer;
+            
+            return (
+              <Zoom 
+                in 
+                key={getOptionKey(option, idx)}
+                style={{ transitionDelay: `${200 + idx * 100}ms` }}
+              >
+                <Paper
+                  elevation={isAnswered && (isCorrectAnswer || isSelectedAnswer) ? 4 : 2}
+                  component="button"
+                  role="button"
+                  tabIndex={isAnswered ? -1 : 0}
+                  aria-disabled={isAnswered}
+                  sx={{
+                    ...getOptionCardStyle(option),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    transition: 'all 0.3s ease',
+                    '&:hover': !isAnswered ? {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+                      borderColor: theme.palette.primary.main,
+                      background: theme.palette.action.hover,
+                    } : {},
+                    '&:active': !isAnswered ? {
+                      transform: 'translateY(0px)',
+                    } : {}
+                  }}
+                  onClick={!isAnswered ? () => handleAnswer(option) : undefined}
+                  onKeyDown={!isAnswered ? (e) => handleOptionKeyDown(option, e) : undefined}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                    <Box sx={{ 
+                      width: 32, 
+                      height: 32, 
+                      borderRadius: '50%', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      backgroundColor: isAnswered ? 
+                        (isCorrectAnswer ? theme.palette.success.main : 
+                         isSelectedAnswer ? theme.palette.error.main : 
+                         theme.palette.action.disabled) :
+                        theme.palette.primary.main + '20',
+                      color: isAnswered ? 'white' : theme.palette.primary.main,
+                      fontWeight: 600,
+                      fontSize: '0.9rem'
+                    }}>
+                      {String.fromCharCode(65 + idx)}
+                    </Box>
+                    <Typography sx={{ flex: 1, textAlign: 'left' }}>
+                      {option}
+                    </Typography>
+                    {isAnswered && isCorrectAnswer && (
+                      <CheckCircle sx={{ color: theme.palette.success.main }} />
+                    )}
+                    {isAnswered && isSelectedAnswer && !isCorrectAnswer && (
+                      <Cancel sx={{ color: theme.palette.error.main }} />
+                    )}
+                  </Box>
+                </Paper>
+              </Zoom>
+            );
+          })}
+        </Stack>
+
+        {/* Hint Section */}
+        {currentWord.mnemonic && (
+          <Fade in={isAnswered} timeout={1000}>
+            <Box sx={{ mt: 3 }}>
+              <Paper 
+                sx={{ 
+                  p: 2, 
+                  borderRadius: 2, 
+                  backgroundColor: theme.palette.info.light + '20',
+                  border: `1px solid ${theme.palette.info.light}`,
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 1
+                }}
+              >
+                <Lightbulb sx={{ color: theme.palette.info.main, mt: 0.5 }} />
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: theme.palette.info.main }}>
+                    💡 Memory Tip
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {currentWord.mnemonic}
+                  </Typography>
+                </Box>
+              </Paper>
+            </Box>
+          </Fade>
+        )}
+      </Box>
+    </Fade>
   );
 };
 

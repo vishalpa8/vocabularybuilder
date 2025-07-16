@@ -7,19 +7,11 @@ export const sm2 = (word, quality) => {
   streak = streak || 0;
 
   if (quality >= 3) { // Correct response
-    if (repetition === 0) {
-      streak += 1;
-      repetition = 1;
-    } else if (repetition === 1) {
-      streak += 1;
-      repetition = 6;
-    } else {
-      streak += 1;
-      repetition *= easinessFactor;
-    }
+    streak += 1;
+    repetition = 3; // Always set to 3 days for revision
   } else { // Incorrect response
     streak = 0;
-    repetition = 0;
+    repetition = 3; // Reset to 3 days for revision
   }
 
   easinessFactor += (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
@@ -119,7 +111,7 @@ export const getWordsForRevisionChallenge = (words, limit = 15) => {
   // 2. If not enough due words, fill with unlearned words not yet due
   if (selectedWords.length < maxWords) {
     const notDueUnlearned = words.filter(
-      (word) => !word.isLearled && new Date(word.nextReview) > now && !selectedWords.some(sw => sw.id === word.id)
+      (word) => !word.isLearned && new Date(word.nextReview) > now && !selectedWords.some(sw => sw.id === word.id)
     );
     const shuffledNotDue = notDueUnlearned.sort(() => 0.5 - Math.random());
     const needed = maxWords - selectedWords.length;

@@ -19,6 +19,7 @@ import {
   Cancel,
   History,
   Delete,
+  DeleteForever,
 } from "@mui/icons-material";
 import InfoModal from "../InfoModal";
 import { filterOldHistory } from "../../utils/quizUtils";
@@ -26,6 +27,7 @@ import { filterOldHistory } from "../../utils/quizUtils";
 const QuizHistory = () => {
   const [history, setHistory] = useState([]);
   const [modalState, setModalState] = useState({ open: false, index: null });
+  const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
 
   useEffect(() => {
     const storedHistory = JSON.parse(
@@ -52,6 +54,12 @@ const QuizHistory = () => {
     closeModal();
   };
 
+  const handleDeleteAll = () => {
+    setHistory([]);
+    localStorage.setItem("quizHistory", JSON.stringify([]));
+    setDeleteAllModalOpen(false);
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = {
@@ -72,14 +80,29 @@ const QuizHistory = () => {
   return (
     <>
       <Paper sx={{ p: { xs: 3, sm: 5 }, mt: 4, borderRadius: 3, boxShadow: 6, overflow: "hidden", bgcolor: "background.paper" }}>
-        <Typography
-          variant="h5"
-          fontWeight={700}
-          gutterBottom
-          sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}
-        >
-          <History sx={{ fontSize: 30 }} /> Quiz History
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
+          <Typography
+            variant="h5"
+            fontWeight={700}
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            <History sx={{ fontSize: 30 }} /> Quiz History
+          </Typography>
+          <Tooltip title="Delete All History">
+            <IconButton
+              onClick={() => setDeleteAllModalOpen(true)}
+              color="error"
+              sx={{
+                background: 'rgba(244, 67, 54, 0.1)',
+                '&:hover': {
+                  background: 'rgba(244, 67, 54, 0.2)'
+                }
+              }}
+            >
+              <DeleteForever />
+            </IconButton>
+          </Tooltip>
+        </Box>
         {history.map((session, index) => (
           <Accordion key={session.date}>
             <AccordionSummary expandIcon={<ExpandMore />} sx={{ py: 1.5 }}>
@@ -161,6 +184,14 @@ const QuizHistory = () => {
         onConfirm={handleDelete}
         title="Confirm Deletion"
         message="Are you sure you want to delete this quiz history? This action cannot be undone."
+        type="confirm"
+      />
+      <InfoModal
+        open={deleteAllModalOpen}
+        onClose={() => setDeleteAllModalOpen(false)}
+        onConfirm={handleDeleteAll}
+        title="Delete All History"
+        message="Are you sure you want to delete ALL quiz history? This action cannot be undone and will permanently remove all your quiz records."
         type="confirm"
       />
     </>

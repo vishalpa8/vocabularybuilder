@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useWords } from "../hooks/useWords";
 import { useBadges } from "../hooks/useBadges";
 import {
@@ -618,6 +618,41 @@ const Dashboard = () => {
     setWordsToOverwrite([]);
   };
 
+  // Progressive loading for stats - memoize expensive calculations
+  const dashboardStats = useMemo(() => {
+    if (!words || words.length === 0) {
+      return {
+        totalWords: 0,
+        wordsLearned: 0,
+        wordsDueForReview: 0,
+        totalPoints: 0,
+      };
+    }
+
+    const now = new Date();
+    let totalPoints = 0;
+    let wordsLearned = 0;
+    let wordsDueForReview = 0;
+
+    // Single pass through words for all calculations
+    words.forEach(word => {
+      totalPoints += word.points || 0;
+      
+      if (word.isLearned) {
+        wordsLearned++;
+      } else if (new Date(word.nextReview) <= now) {
+        wordsDueForReview++;
+      }
+    });
+
+    return {
+      totalWords: words.length,
+      wordsLearned,
+      wordsDueForReview,
+      totalPoints,
+    };
+  }, [words]);
+
   if (!words) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -626,12 +661,7 @@ const Dashboard = () => {
     );
   }
 
-  const totalWords = words.length;
-  const wordsLearned = words.filter((word) => word.isLearned).length;
-  const wordsDueForReview = words.filter(
-    (word) => new Date(word.nextReview) <= new Date() && !word.isLearned
-  ).length;
-  const totalPoints = words.reduce((acc, word) => acc + (word.points || 0), 0);
+  const { totalWords, wordsLearned, wordsDueForReview, totalPoints } = dashboardStats;
 
   const StatCard = ({ title, value, icon }) => (
     <Grid item xs={12} sm={6} md={3}>
