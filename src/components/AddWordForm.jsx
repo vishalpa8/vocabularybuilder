@@ -34,7 +34,7 @@ import {
   normalizeWordKey,
   parsePastedJson,
 } from "../utils/wordUtils";
-import { uploadJson } from "../utils/fileUtils";
+import { uploadJson, exampleJSON } from "../utils/fileUtils";
 
 const processTags = (tagsInput) =>
   typeof tagsInput === "string"
@@ -747,7 +747,7 @@ const AddWordForm = () => {
           <TextField
             value={pasteJsonText}
             onChange={(e) => setPasteJsonText(e.target.value)}
-            placeholder='[{"word": "...", "meaning": "..."}]'
+            placeholder={exampleJSON}
             minRows={8}
             fullWidth
             multiline

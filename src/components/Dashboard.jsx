@@ -30,21 +30,9 @@ import {
 } from "@mui/icons-material";
 import InfoModal from "./InfoModal";
 import Badges from "./Badges";
-import { downloadJson, uploadJson } from "../utils/fileUtils";
+import { downloadJson, uploadJson, exampleJSON } from "../utils/fileUtils";
 import { normalizeWordKey } from "../utils/wordUtils";
 import { badgeCriteria } from "../utils/badgeUtils";
-
-// Example JSON for Format Info (and copy)
-const exampleJSON = `[
-  {
-    "word": "Ephemeral",
-    "meaning": "Lasting for a very short time.",
-    "partOfSpeech": "Adjective",
-    "sampleSentence": "The beauty of the cherry blossoms is ephemeral.",
-    "tags": ["transience", "nature"],
-    "mnemonic": "Sounds like 'a funeral' - life is short."
-  }
-]`;
 
 function cleanUpdateObject(obj) {
   // Remove undefined/null fields to avoid overwriting with blanks.
@@ -301,19 +289,21 @@ const Dashboard = () => {
       importedWords.forEach((word, index) => {
         const missingFields = [];
         if (!word.word || typeof word.word !== "string" || !word.word.trim())
-          missingFields.push('&quot;word&quot; (string, required)');
+          missingFields.push("&quot;word&quot; (string, required)");
         if (
           !word.meaning ||
           typeof word.meaning !== "string" ||
           !word.meaning.trim()
         )
-          missingFields.push('&quot;meaning&quot; (string, required)');
+          missingFields.push("&quot;meaning&quot; (string, required)");
         if (
           word.tags &&
           !Array.isArray(word.tags) &&
           typeof word.tags !== "string"
         )
-          missingFields.push('&quot;tags&quot; (should be array or comma-separated string)');
+          missingFields.push(
+            "&quot;tags&quot; (should be array or comma-separated string)"
+          );
         if (missingFields.length > 0) {
           validationErrors.push(
             `Entry ${index + 1} (word: ${
@@ -340,8 +330,8 @@ const Dashboard = () => {
                 ))}
               </ul>
               <Typography>
-                Please ensure each word has valid &quot;word&quot; and &quot;meaning&quot;
-                properties.
+                Please ensure each word has valid &quot;word&quot; and
+                &quot;meaning&quot; properties.
               </Typography>
             </Box>
           ),
@@ -358,8 +348,8 @@ const Dashboard = () => {
           title: "Import Warning",
           message: (
             <Typography>
-              You&apos;re trying to import {importedWords.length} words at once. For
-              best performance, consider importing smaller batches.
+              You&apos;re trying to import {importedWords.length} words at once.
+              For best performance, consider importing smaller batches.
             </Typography>
           ),
           type: "info",
@@ -792,4 +782,3 @@ const Dashboard = () => {
   );
 };
 export default Dashboard;
-
