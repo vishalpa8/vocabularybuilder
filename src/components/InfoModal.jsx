@@ -12,6 +12,7 @@ const InfoModal = ({
   type = "info", // 'info', 'confirm', 'success', 'error'
   maxWidth = 400,
   importOptions = [],
+  showButtons = true, // New prop to control button visibility
 }) => {
   const modalStyle = {
     position: "absolute",
@@ -22,13 +23,16 @@ const InfoModal = ({
     maxWidth,
     bgcolor: "background.paper",
     boxShadow: 24,
-    p: 4,
+    p: type === "edit" ? 2 : 4,
     borderRadius: 2,
-    textAlign: "center",
+    textAlign: type === "edit" ? "left" : "center",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    alignItems: type === "edit" ? "stretch" : "center",
     outline: "none",
+    maxHeight: type === "edit" ? "95vh" : "90vh",
+    height: type === "edit" ? "auto" : "auto",
+    overflow: type === "edit" ? "hidden" : "auto",
   };
 
   const iconStyle = {
@@ -40,6 +44,7 @@ const InfoModal = ({
     confirm: <Info color="action" sx={iconStyle} />,
     success: <CheckCircle color="success" sx={iconStyle} />,
     error: <Cancel color="error" sx={iconStyle} />,
+    edit: null, // No icon for edit type
   };
 
   // Button arrangement based on importOptions for full flexibility
@@ -59,55 +64,67 @@ const InfoModal = ({
     >
       <Paper sx={modalStyle} tabIndex={-1}>
         {icons[type]}
-        <Typography id="modal-title" variant="h5" component="h2" sx={{ mb: 2 }}>
-          {title}
-        </Typography>
-        <Box id="modal-description" sx={{ mb: 4, width: "100%" }}>
+        {title && (
+          <Typography
+            id="modal-title"
+            variant="h5"
+            component="h2"
+            sx={{ mb: 2 }}
+          >
+            {title}
+          </Typography>
+        )}
+        <Box
+          id="modal-description"
+          sx={{ mb: showButtons ? 4 : 0, width: "100%" }}
+        >
           {message}
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            gap: 2,
-            width: "100%",
-            flexWrap: "wrap",
-          }}
-        >
-          {showConfirm && (
-            <Button
-              variant="outlined"
-              onClick={onClose}
-              startIcon={<Cancel />}
-              size="large"
-              sx={{ flexGrow: 1 }}
-            >
-              Cancel
-            </Button>
-          )}
-          {showAddOnlyNew && (
-            <Button
-              variant="outlined"
-              onClick={onAddOnlyNew}
-              color="secondary"
-              size="large"
-              sx={{ flexGrow: 1 }}
-            >
-              Add Only New Words
-            </Button>
-          )}
-          <Button
-            variant="contained"
-            onClick={onConfirm || onClose}
-            color={showConfirm ? "primary" : "inherit"}
-            startIcon={showConfirm ? <CheckCircle /> : null}
-            size="large"
-            sx={{ flexGrow: 1 }}
-            autoFocus
+        {showButtons && (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 2,
+              width: "100%",
+              flexWrap: "wrap",
+            }}
           >
-            {confirmLabel}
-          </Button>
-        </Box>
+            {showConfirm && (
+              <Button
+                variant="outlined"
+                onClick={onClose}
+                startIcon={<Cancel />}
+                size="large"
+                sx={{ flexGrow: 1 }}
+              >
+                Cancel
+              </Button>
+            )}
+            {showAddOnlyNew && (
+              <Button
+                variant="outlined"
+                onClick={onAddOnlyNew}
+                color="secondary"
+                size="large"
+                sx={{ flexGrow: 1 }}
+              >
+                Add Only New Words
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              onClick={onConfirm || onClose}
+              color={showConfirm ? "primary" : "inherit"}
+              startIcon={showConfirm ? <CheckCircle /> : null}
+              size="large"
+              sx={{ flexGrow: 1 }}
+              autoFocus
+            >
+              {confirmLabel}
+            </Button>
+          </Box>
+        )}
       </Paper>
     </Modal>
   );

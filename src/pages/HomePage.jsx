@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
 import WordList from "../components/WordList";
 import VirtualWordList from "../components/VirtualWordList";
-import WordOfTheDay from "../components/WordOfTheDay";
 import {
   TextField,
   Box,
@@ -47,18 +46,68 @@ const HomePage = () => {
     return words && words.length > 50;
   }, [words]);
 
+  // Quick stats calculation
+  const quickStats = useMemo(() => {
+    if (!words || words.length === 0) {
+      return {
+        totalWords: 0,
+        wordsLearned: 0,
+        favoriteWords: 0,
+      };
+    }
+
+    const totalWords = words.length;
+    const wordsLearned = words.filter(word => word.isLearned).length;
+    const favoriteWords = words.filter(word => word.isFavorite).length;
+
+    return {
+      totalWords,
+      wordsLearned,
+      favoriteWords,
+    };
+  }, [words]);
+
   return (
-    <Box>
-      <Box sx={{ mb: 4, textAlign: "center" }}>
-        <Typography variant="h2" gutterBottom>
+    <Box sx={{ position: "relative" }}>
+      {/* Hero Section */}
+      <Box sx={{ mb: 6, textAlign: "center" }}>
+        <Typography variant="h2" gutterBottom sx={{ fontWeight: 700 }}>
           Your Personal Vocabulary
         </Typography>
-        <Typography color="text.secondary">
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
           Search, review, and master words you&apos;ve collected.
         </Typography>
+        
+        {/* Integrated Stats in Hero */}
+        {words && words.length > 0 && (
+          <Stack direction="row" spacing={3} justifyContent="center" sx={{ mb: 4 }}>
+            <Box sx={{ textAlign: "center" }}>
+              <Typography variant="h4" color="primary" fontWeight="bold">
+                {quickStats.totalWords}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Total Words
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: "center" }}>
+              <Typography variant="h4" color="success.main" fontWeight="bold">
+                {quickStats.wordsLearned}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Mastered
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: "center" }}>
+              <Typography variant="h4" color="error.main" fontWeight="bold">
+                {quickStats.favoriteWords}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Favorites
+              </Typography>
+            </Box>
+          </Stack>
+        )}
       </Box>
-
-      <WordOfTheDay />
 
       {/* Controls: Toggle and Tag Filter in a Row */}
       <Box sx={{ my: 4, display: "flex", justifyContent: "center" }}>

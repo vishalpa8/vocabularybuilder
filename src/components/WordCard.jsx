@@ -37,6 +37,63 @@ const WordCard = ({ word }) => {
   const handlePronunciation = (e) => {
     e.stopPropagation();
     const utterance = new SpeechSynthesisUtterance(word.word);
+
+    // Configure for female voice with expanded options
+    const voices = speechSynthesis.getVoices();
+
+    // Prioritize specific female voices by name
+    const femaleVoice = voices.find((voice) => {
+      const name = voice.name.toLowerCase();
+      return (
+        name.includes("female") ||
+        name.includes("woman") ||
+        name.includes("zira") ||
+        name.includes("helen") ||
+        name.includes("susan") ||
+        name.includes("samantha") ||
+        name.includes("karen") ||
+        name.includes("catherine") ||
+        name.includes("hazel") ||
+        name.includes("fiona") ||
+        name.includes("jenny") ||
+        name.includes("melissa") ||
+        name.includes("allison") ||
+        name.includes("nicole") ||
+        name.includes("lucy") ||
+        name.includes("ava") ||
+        name.includes("emma") ||
+        name.includes("tessa") ||
+        name.includes("moira") ||
+        name.includes("sara") ||
+        name.includes("anna") ||
+        name.includes("alice") ||
+        (name.includes("english") && name.includes("female"))
+      );
+    });
+
+    // Secondary option: any English voice that doesn't contain 'male'
+    const englishVoice = voices.find(
+      (voice) =>
+        voice.lang.startsWith("en") &&
+        !voice.name.toLowerCase().includes("male")
+    );
+
+    // Third option: any voice with higher pitch characteristics
+    const anyVoice = voices.find((voice) => voice.lang.startsWith("en"));
+
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+    } else if (englishVoice) {
+      utterance.voice = englishVoice;
+    } else if (anyVoice) {
+      utterance.voice = anyVoice;
+    }
+
+    // Enhanced voice characteristics for feminine sound
+    utterance.pitch = 1.3; // Higher pitch
+    utterance.rate = 0.85; // Slightly slower for clarity
+    utterance.volume = 0.8; // Comfortable volume
+
     speechSynthesis.speak(utterance);
   };
 
@@ -71,6 +128,11 @@ const WordCard = ({ word }) => {
           flexDirection: "column",
           height: "100%",
           minHeight: 300,
+          transition: "transform 0.3s, box-shadow 0.3s",
+          "&:hover": {
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+            transform: "scale(1.02)",
+          },
         }}
       >
         <CardContent sx={{ flexGrow: 1, pb: 0 }}>
@@ -203,9 +265,11 @@ const WordCard = ({ word }) => {
       <InfoModal
         open={editOpen}
         onClose={handleCloseEdit}
-        title={`Edit "${word.word}"`}
+        title=""
         message={<EditWordForm word={word} onSave={handleCloseEdit} />}
-        maxWidth={650}
+        maxWidth={780}
+        showButtons={false}
+        type="edit"
       />
     </>
   );

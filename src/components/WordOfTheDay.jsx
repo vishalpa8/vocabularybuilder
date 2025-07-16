@@ -1,105 +1,158 @@
 import React, { useState, useEffect } from "react";
 import { useWords } from "../hooks/useWords";
-import { Paper, Typography, Box, CircularProgress } from "@mui/material";
-import { WbSunny } from "@mui/icons-material";
+import { 
+  Typography, 
+  Box, 
+  Modal, 
+  IconButton,
+  Fade,
+  Backdrop
+} from "@mui/material";
+import { WbSunny, Close } from "@mui/icons-material";
 
-const WordOfTheDay = () => {
+const WordOfTheDay = ({ open, onClose }) => {
   const { words } = useWords();
   const [wordOfTheDay, setWordOfTheDay] = useState(null);
 
   useEffect(() => {
-    if (words && words.length > 0) {
+    if (words && words.length > 0 && open) {
       const today = new Date().toDateString();
       const storedWordData = JSON.parse(localStorage.getItem("wordOfTheDay"));
 
+      let currentWord;
+      
+      // Get or generate word of the day
       if (storedWordData && storedWordData.date === today) {
-        setWordOfTheDay(storedWordData.word);
+        currentWord = storedWordData.word;
       } else {
-        const newWord = words[Math.floor(Math.random() * words.length)];
+        currentWord = words[Math.floor(Math.random() * words.length)];
         localStorage.setItem(
           "wordOfTheDay",
-          JSON.stringify({ word: newWord, date: today })
+          JSON.stringify({ word: currentWord, date: today })
         );
-        setWordOfTheDay(newWord);
       }
+      
+      setWordOfTheDay(currentWord);
     }
-  }, [words]);
+  }, [words, open]);
 
-  if (!words) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
 
-  if (!wordOfTheDay) {
+  if (!words || !wordOfTheDay) {
     return null;
   }
 
   return (
-    <Paper
-      sx={{
-        p: { xs: 3, sm: 4 },
-        mt: 4,
-        borderRadius: 3,
-        maxWidth: 600,
-        width: "100%",
-        mx: "auto",
-        boxShadow: 4,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+    <Modal
+      open={open}
+      onClose={handleClose}
+      closeAfterTransition
+      BackdropComponent={Backdrop}
+      BackdropProps={{
+        timeout: 500,
       }}
-      elevation={3}
     >
-      <Typography
-        variant="h4"
-        sx={{
-          mb: 2,
-          fontWeight: 800,
-          letterSpacing: 1,
-          color: "primary.main",
-        }}
-      >
-        Word of the Day
-      </Typography>
-
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 3,
-          mb: 2,
-        }}
-      >
-        <WbSunny sx={{ fontSize: 46, color: "orange" }} />
-        <Typography
-          variant="h3"
-          component="div"
-          fontWeight="bold"
+      <Fade in={open}>
+        <Box
           sx={{
-            textAlign: "center",
-            wordBreak: "break-word",
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '90%', sm: '80%', md: '600px' },
+            bgcolor: 'background.paper',
+            borderRadius: 3,
+            boxShadow: 24,
+            p: 0,
+            outline: 'none',
+            maxHeight: '90vh',
+            overflow: 'auto',
           }}
         >
-          {wordOfTheDay.word}
-        </Typography>
-      </Box>
+          {/* Close button */}
+          <Box sx={{ position: 'relative' }}>
+            <IconButton
+              onClick={handleClose}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: 'text.secondary',
+                zIndex: 1,
+              }}
+            >
+              <Close />
+            </IconButton>
+          </Box>
+          
+          {/* Content */}
+          <Box
+            sx={{
+              p: { xs: 3, sm: 4 },
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+            }}
+          >
 
-      <Typography
-        color="text.secondary"
-        sx={{
-          textAlign: "center",
-          fontSize: "1.25rem",
-          maxWidth: 480,
-          mt: 1,
-        }}
-      >
-        {wordOfTheDay.meaning}
-      </Typography>
-    </Paper>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 3,
+                mb: 2,
+              }}
+            >
+              <WbSunny sx={{ fontSize: 46, color: "orange" }} />
+              <Typography
+                variant="h3"
+                component="div"
+                fontWeight="bold"
+                sx={{
+                  textAlign: "center",
+                  wordBreak: "break-word",
+                }}
+              >
+                {wordOfTheDay.word}
+              </Typography>
+            </Box>
+
+            <Typography
+              color="text.secondary"
+              sx={{
+                textAlign: "center",
+                fontSize: "1.25rem",
+                maxWidth: 480,
+                mt: 1,
+              }}
+            >
+              {wordOfTheDay.meaning}
+            </Typography>
+            
+            {/* Optional: Show additional info */}
+            {wordOfTheDay.sampleSentence && (
+              <Typography
+                variant="body2"
+                sx={{
+                  mt: 2,
+                  fontStyle: "italic",
+                  color: "text.secondary",
+                  maxWidth: 480,
+                }}
+              >
+                &quot;{wordOfTheDay.sampleSentence}&quot;
+              </Typography>
+            )}
+          </Box>
+        </Box>
+      </Fade>
+    </Modal>
   );
 };
 

@@ -24,9 +24,11 @@ import {
   Brightness4,
   Brightness7,
   Menu as MenuIcon,
+  WbSunny,
 } from "@mui/icons-material";
 import { useThemeContext } from "../contexts/ThemeContext.jsx";
 import { useTheme } from "@mui/material/styles";
+import WordOfTheDay from "./WordOfTheDay.jsx";
 
 const navItems = [
   { text: "Home", to: "/", icon: <Home /> },
@@ -40,6 +42,7 @@ const Navbar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [wordOfTheDayOpen, setWordOfTheDayOpen] = useState(false);
   const location = useLocation();
 
   // Ultra-tight icon-text spacing!
@@ -71,6 +74,7 @@ const Navbar = () => {
   });
 
   const handleDrawerToggle = useCallback(() => setDrawerOpen(!drawerOpen), [drawerOpen]);
+  const handleWordOfTheDayToggle = () => setWordOfTheDayOpen(!wordOfTheDayOpen);
 
   // Memoize drawer content for mobile
   const drawerContent = useMemo(() => (
@@ -142,17 +146,21 @@ const Navbar = () => {
 
   return (
     <>
-      <AppBar position="static" color="default" elevation={0}>
+      <AppBar position="sticky" color="default" elevation={1} sx={{ top: 0, zIndex: 1100 }}>
         <Toolbar>
           <Typography
             variant="h6"
             component="div"
-            sx={{ flexGrow: 1, fontWeight: "bold" }}
+            sx={{ fontWeight: "bold" }}
           >
             Vocabuild
           </Typography>
+          <Box sx={{ flexGrow: 1 }} />
           {isMobile ? (
             <>
+              <IconButton onClick={handleWordOfTheDayToggle} color="inherit">
+                <WbSunny />
+              </IconButton>
               <IconButton onClick={toggleTheme} color="inherit">
                 {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
               </IconButton>
@@ -178,6 +186,24 @@ const Navbar = () => {
                   {item.text}
                 </Button>
               ))}
+              <Button
+                onClick={handleWordOfTheDayToggle}
+                variant="contained"
+                startIcon={<WbSunny />}
+                sx={{
+                  ml: 1,
+                  bgcolor: theme.palette.mode === 'dark' ? '#424242' : '#FFF3E0',
+                  color: theme.palette.mode === 'dark' ? '#FFD54F' : '#FFA000',
+                  '&:hover': {
+                    bgcolor: theme.palette.mode === 'dark' ? '#535353' : '#FFE0B2',
+                  },
+                  boxShadow: 'none',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                }}
+              >
+                Word of the Day
+              </Button>
               <IconButton sx={{ ml: 1 }} onClick={toggleTheme} color="inherit">
                 {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
               </IconButton>
@@ -188,6 +214,7 @@ const Navbar = () => {
       <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerToggle}>
         {drawerContent}
       </Drawer>
+      <WordOfTheDay open={wordOfTheDayOpen} onClose={handleWordOfTheDayToggle} />
     </>
   );
 };

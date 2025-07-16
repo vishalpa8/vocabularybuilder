@@ -17,6 +17,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  InputAdornment,
+  IconButton,
+  CircularProgress,
 } from "@mui/material";
 import {
   TextFields as TextFieldsIcon,
@@ -26,6 +29,7 @@ import {
   LocalOffer as LocalOfferIcon,
   Add as AddIcon,
   ContentPaste as ContentPasteIcon,
+  Search as SearchIcon,
 } from "@mui/icons-material";
 import InfoModal from "./InfoModal";
 import { db } from "../db/db";
@@ -35,6 +39,7 @@ import {
   parsePastedJson,
 } from "../utils/wordUtils";
 import { uploadJson, exampleJSON } from "../utils/fileUtils";
+import { fetchWordData } from "../utils/dictionaryApi";
 
 const processTags = (tagsInput) =>
   typeof tagsInput === "string"
@@ -71,6 +76,7 @@ const AddWordForm = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [isSearching, setIsSearching] = useState(false);
   const [modalState, setModalState] = useState({
     open: false,
     title: "",
@@ -88,6 +94,49 @@ const AddWordForm = () => {
 
   // Save state for import dialog actions (optional for advanced flows)
   const [pendingImport, setPendingImport] = useState(null);
+
+  const handleSearch = async () => {
+    const word = formState.word?.trim();
+
+    if (!word) {
+      showSnackbar("Please enter a word to search.", "info");
+      return;
+    }
+
+    setIsSearching(true);
+
+    try {
+      const data = await fetchWordData(word);
+
+      if (data) {
+        setFormState((prev) => ({
+          ...prev,
+          meaning: data.meaning || prev.meaning,
+          partOfSpeech: data.partOfSpeech || prev.partOfSpeech,
+          sampleSentence: data.sampleSentence || prev.sampleSentence,
+        }));
+        showSnackbar("Word data fetched successfully!", "success");
+      } else {
+        showSnackbar("No data found for this word.", "info");
+      }
+    } catch (error) {
+      let errorMessage = "Failed to fetch word data. Please try again later.";
+
+      try {
+        const parsed = JSON.parse(error.message);
+        if (parsed?.message) {
+          errorMessage = parsed.message;
+        }
+      } catch {
+        if (error.message) {
+          errorMessage = error.message;
+        }
+      }
+      showSnackbar(errorMessage, "error");
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   // --------------------------
   // Robust Import Handler!
@@ -564,7 +613,7 @@ const AddWordForm = () => {
         <Divider sx={{ mb: 3 }} />
         <Grid container spacing={3}>
           {/* Word (required, icon, custom red star) */}
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={8}>
             <TextField
               name="word"
               label={
@@ -588,14 +637,33 @@ const AddWordForm = () => {
               }
               value={formState.word}
               onChange={handleChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSearch();
+                }
+              }}
               fullWidth
               error={!!errors.word}
               helperText={errors.word}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleSearch} disabled={isSearching}>
+                      {isSearching ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <SearchIcon />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
           </Grid>
           {/* Part of Speech */}
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth variant="outlined" sx={{ minWidth: 160 }}>
+          <Grid item xs={12} sm={4}>
+            <FormControl fullWidth variant="outlined">
               <InputLabel id="part-of-speech-label">Part of Speech</InputLabel>
               <Select
                 labelId="part-of-speech-label"
