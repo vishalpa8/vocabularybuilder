@@ -8,6 +8,7 @@ Vocabuild is a modern, streamlined Progressive Web App (PWA) designed to help yo
 
   - **Add Words**: Easily add new words with definitions, parts of speech, and sample sentences.
   - **Word List**: A clean and searchable list of all your words.
+  - **Data Management**: Export your vocabulary to JSON, import words from a JSON file, and reset all your data with a confirmation prompt.
 
 - **🧠 Focused Quiz System**:
 
@@ -25,10 +26,14 @@ Vocabuild is a modern, streamlined Progressive Web App (PWA) designed to help yo
   - Earn badges for core milestones like adding your first words, maintaining a study streak, and mastering new vocabulary.
 
 - **🎨 User-Friendly Interface**:
-  - **Modern & Clean Design**: Enjoy a simple and intuitive interface.
+  - **Modern & Clean Design**: Enjoy a simple and intuitive interface with improved button and tooltip styling.
   - **Light & Dark Modes**: Switch between light and dark themes for comfort.
   - **Fully Responsive**: Use Vocabuild on any device, from desktop to mobile.
   - **PWA Ready**: Install Vocabuild on your device for an app-like experience and offline access.
+
+- **☀️ Word of the Day**:
+  - Discover a new word daily with its meaning and sample sentence.
+  - Gracefully handles cases where no words are available, prompting the user to add words.
 
 ## 🏆 Gamification
 
