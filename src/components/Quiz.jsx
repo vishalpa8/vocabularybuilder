@@ -16,7 +16,6 @@ import {
   MenuItem,
   Select,
   FormControl,
-  InputLabel,
   Fade,
   Stack,
   ToggleButton,
@@ -24,11 +23,8 @@ import {
   Chip,
   Card,
   CardContent,
-  Tooltip,
   Zoom,
-  Slide,
   Modal,
-  Divider,
   IconButton,
 } from "@mui/material";
 import { 
@@ -67,7 +63,7 @@ if (typeof document !== 'undefined' && !document.querySelector('#quiz-pulse-anim
   document.head.appendChild(style);
 }
 
-const Quiz = ({ onSessionStateChange }) => {
+const Quiz = () => {
   const { words, updateWord } = useWords();
   const [quizWords, setQuizWords] = useState([]);
   const [lastQuizWords, setLastQuizWords] = useState(null);
@@ -92,13 +88,6 @@ const Quiz = ({ onSessionStateChange }) => {
   // Timer State
   const [timeLeft, setTimeLeft] = useState(300); // 5:00 in seconds
 
-  useEffect(() => {
-    if (onSessionStateChange) {
-      onSessionStateChange(quizStatus !== "setup");
-    }
-  }, [quizStatus, onSessionStateChange]);
-  
-  // Timer effect - countdown timer for quiz, typing, and revision modes
   useEffect(() => {
     let interval;
     if (quizStatus === 'answering' && (quizMode === 'quiz' || quizMode === 'typing' || quizMode === 'revision')) {

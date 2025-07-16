@@ -9,9 +9,6 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-
-
 
 const QuizTyping = ({
   currentWord,
@@ -24,7 +21,6 @@ const QuizTyping = ({
   typingAttempts,
 }) => {
   const [answer, setAnswer] = useState("");
-  const theme = useTheme();
   const [lastWordId, setLastWordId] = useState(null);
 
   // Reset input only when new question is loaded
