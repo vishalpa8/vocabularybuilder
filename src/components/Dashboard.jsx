@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useWords } from "../hooks/useWords";
+import { useBadges } from "../hooks/useBadges";
 import {
   Grid,
   Paper,
@@ -25,10 +26,13 @@ import {
   ExpandMore,
   ContentCopy,
   CheckCircle,
+  Star,
 } from "@mui/icons-material";
 import InfoModal from "./InfoModal";
+import Badges from "./Badges";
 import { downloadJson, uploadJson } from "../utils/fileUtils";
 import { normalizeWordKey } from "../utils/wordUtils";
+import { badgeCriteria } from "../utils/badgeUtils";
 
 // Example JSON for Format Info (and copy)
 const exampleJSON = `[
@@ -55,6 +59,7 @@ function cleanUpdateObject(obj) {
 
 const Dashboard = () => {
   const { words, addWord, updateWord } = useWords();
+  const { badges, addBadge } = useBadges();
   const [modalState, setModalState] = useState({
     open: false,
     title: "",
@@ -65,6 +70,34 @@ const Dashboard = () => {
   const [fileToImport, setFileToImport] = useState(null);
   const [wordsToOverwrite, setWordsToOverwrite] = useState([]);
   const [copied, setCopied] = useState(false); // for copy feedback
+
+  useEffect(() => {
+    if (words && badges) {
+      checkAndAwardBadges();
+    }
+  }, [words, badges]);
+
+  const checkAndAwardBadges = () => {
+    const earnedBadgeNames = new Set(badges.map((b) => b.name));
+    badgeCriteria.forEach((badge) => {
+      if (!earnedBadgeNames.has(badge.name)) {
+        let conditionMet = false;
+        if (badge.condition.length > 0) {
+          conditionMet = badge.condition(words);
+        } else {
+          conditionMet = badge.condition();
+        }
+
+        if (conditionMet) {
+          addBadge({
+            name: badge.name,
+            description: badge.description,
+            dateEarned: new Date(),
+          });
+        }
+      }
+    });
+  };
 
   // Export words to JSON
   const handleExport = () => {
@@ -608,9 +641,10 @@ const Dashboard = () => {
   const wordsDueForReview = words.filter(
     (word) => new Date(word.nextReview) <= new Date() && !word.isLearned
   ).length;
+  const totalPoints = words.reduce((acc, word) => acc + (word.points || 0), 0);
 
   const StatCard = ({ title, value, icon }) => (
-    <Grid item xs={12} sm={6} md={4}>
+    <Grid item xs={12} sm={6} md={3}>
       <Paper
         sx={{
           p: 3,
@@ -668,19 +702,29 @@ const Dashboard = () => {
           value={wordsDueForReview}
           icon={<Schedule sx={{ fontSize: 40 }} color="error" />}
         />
+        <StatCard
+          title="Total Points"
+          value={totalPoints}
+          icon={<Star sx={{ fontSize: 40 }} color="warning" />}
+        />
       </Grid>
+
+      {/* --- Badges Section --- */}
+      <Badges />
 
       {/* --- Manage Data Section --- */}
       <Paper
         sx={{
-          p: { xs: 2, sm: 3 },
-          mt: 2,
-          borderRadius: 2,
+          p: { xs: 3, sm: 5 }, // Increased padding
+          mt: 4, // Increased top margin
+          borderRadius: 3, // More rounded corners
           maxWidth: 600,
           mx: "auto",
           textAlign: "center",
+          boxShadow: 6, // More prominent shadow
+          bgcolor: "background.paper", // Ensure consistent background
         }}
-        elevation={1}
+        elevation={3}
       >
         <Typography variant="h5" sx={{ mb: 2 }}>
           Manage Your Data
@@ -748,3 +792,4 @@ const Dashboard = () => {
   );
 };
 export default Dashboard;
+

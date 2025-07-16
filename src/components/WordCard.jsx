@@ -19,6 +19,7 @@ import {
   Lightbulb,
   FormatQuote,
   Edit,
+  VolumeUp,
 } from "@mui/icons-material";
 import InfoModal from "./InfoModal";
 import EditWordForm from "./EditWordForm";
@@ -32,6 +33,12 @@ const WordCard = ({ word }) => {
   const handleCloseConfirm = () => setConfirmOpen(false);
   const handleOpenEdit = () => setEditOpen(true);
   const handleCloseEdit = () => setEditOpen(false);
+
+  const handlePronunciation = (e) => {
+    e.stopPropagation();
+    const utterance = new SpeechSynthesisUtterance(word.word);
+    speechSynthesis.speak(utterance);
+  };
 
   const handleDelete = () => {
     deleteWord(word.id);
@@ -58,7 +65,14 @@ const WordCard = ({ word }) => {
 
   return (
     <>
-      <Card sx={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 300 }}>
+      <Card
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          minHeight: 300,
+        }}
+      >
         <CardContent sx={{ flexGrow: 1, pb: 0 }}>
           <Box
             sx={{
@@ -87,7 +101,10 @@ const WordCard = ({ word }) => {
             {getStatusChip()}
           </Box>
           <Divider sx={{ my: 1.5 }} />
-          <Typography variant="body1" sx={{ mb: 2, overflowWrap: "break-word" }}>
+          <Typography
+            variant="body1"
+            sx={{ mb: 2, overflowWrap: "break-word" }}
+          >
             {word.meaning}
           </Typography>
 
@@ -96,7 +113,10 @@ const WordCard = ({ word }) => {
               sx={{ display: "flex", gap: 1.5, color: "text.secondary", mb: 2 }}
             >
               <FormatQuote sx={{ transform: "scaleX(-1)" }} fontSize="small" />
-              <Typography variant="body2" sx={{ fontStyle: "italic", overflowWrap: "break-word" }}>
+              <Typography
+                variant="body2"
+                sx={{ fontStyle: "italic", overflowWrap: "break-word" }}
+              >
                 {word.sampleSentence}
               </Typography>
             </Box>
@@ -114,7 +134,9 @@ const WordCard = ({ word }) => {
               }}
             >
               <Lightbulb fontSize="small" />
-              <Typography variant="body2" sx={{ overflowWrap: "break-word" }}>{word.mnemonic}</Typography>
+              <Typography variant="body2" sx={{ overflowWrap: "break-word" }}>
+                {word.mnemonic}
+              </Typography>
             </Box>
           )}
         </CardContent>
@@ -137,17 +159,15 @@ const WordCard = ({ word }) => {
               word.tags
                 .slice(0, 3)
                 .map(
-                  (tag) =>
-                    tag && (
-                      <Chip
-                        key={tag}
-                        label={tag}
-                        size="small"
-                      />
-                    )
+                  (tag) => tag && <Chip key={tag} label={tag} size="small" />
                 )}
           </Box>
           <Box sx={{ display: "flex" }}>
+            <Tooltip title="voice">
+              <IconButton onClick={handlePronunciation} size="small">
+                <VolumeUp />
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Edit">
               <IconButton onClick={handleOpenEdit} size="small">
                 <Edit fontSize="small" />

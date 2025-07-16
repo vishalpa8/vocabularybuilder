@@ -4,33 +4,38 @@ import { Replay, ArrowBack } from "@mui/icons-material";
 import QuizResultDetails from "./QuizResultDetails";
 import QuizHistory from "./QuizHistory";
 
-const QuizComplete = ({ results, onRestart, onReturn }) => {
+const QuizComplete = ({ results, onRestart, onReturn, quizMode }) => {
   const correctAnswers = results.filter((r) => r.isCorrect).length;
   const totalQuestions = results.length;
+  const retentionScore = totalQuestions > 0 ? ((correctAnswers / totalQuestions) * 100).toFixed(0) : 0;
 
   return (
     <Box sx={{ maxWidth: 600, mx: "auto", mt: { xs: 2, sm: 5 } }}>
       <Paper
         sx={{
           textAlign: "center",
-          p: { xs: 2, sm: 4 },
-          borderRadius: 2,
-          boxShadow: 3,
+          p: { xs: 3, sm: 5 }, // Increased padding
+          borderRadius: 3, // More rounded corners
+          boxShadow: 6, // More prominent shadow
+          bgcolor: "background.paper", // Ensure consistent background
         }}
       >
-        <Typography variant="h5" fontWeight={600} gutterBottom>
-          Quiz Complete!
+        <Typography variant="h4" fontWeight={700} gutterBottom sx={{ mb: 2 }}>
+          {quizMode === 'revision' ? 'Revision Complete!' : 'Quiz Complete!'}
         </Typography>
-        <Typography variant="h6" color="success.main" sx={{ my: 2 }}>
-          You scored {correctAnswers} out of {totalQuestions}.
+        <Typography variant="h5" color="success.main" sx={{ my: 3, fontWeight: 600 }}>
+          {quizMode === 'revision' ? 
+            `Your Retention Score: ${retentionScore}%` : 
+            `You scored ${correctAnswers} out of ${totalQuestions}.`
+          }
         </Typography>
         <QuizResultDetails results={results} />
         <Box
           sx={{
-            mt: 3,
+            mt: 4, // Increased top margin
             display: "flex",
             justifyContent: "center",
-            gap: 2,
+            gap: 3, // Increased gap between buttons
             flexWrap: "wrap",
           }}
         >

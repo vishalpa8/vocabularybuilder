@@ -71,28 +71,35 @@ const QuizHistory = () => {
 
   return (
     <>
-      <Paper sx={{ p: { xs: 2, sm: 3 }, mt: 4, overflow: "hidden" }}>
+      <Paper sx={{ p: { xs: 3, sm: 5 }, mt: 4, borderRadius: 3, boxShadow: 6, overflow: "hidden", bgcolor: "background.paper" }}>
         <Typography
           variant="h5"
+          fontWeight={700}
           gutterBottom
-          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}
         >
-          <History /> Quiz History
+          <History sx={{ fontSize: 30 }} /> Quiz History
         </Typography>
         {history.map((session, index) => (
           <Accordion key={session.date}>
-            <AccordionSummary expandIcon={<ExpandMore />}>
-              <Box>
-                <Typography sx={{ flexShrink: 0, mr: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMore />} sx={{ py: 1.5 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <Typography variant="subtitle1" fontWeight={600} sx={{ flexShrink: 0, mr: 2 }}>
                   {formatDate(session.date)}
                 </Typography>
-                <Typography sx={{ color: "text.secondary" }}>
+                <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
                   Score: {session.score.correct} / {session.score.total}
                 </Typography>
               </Box>
             </AccordionSummary>
             <AccordionDetails
-              sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
+                pt: 0, // Remove top padding to reduce space
+                pb: 2, // Add some bottom padding
+              }}
             >
               <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
                 <Tooltip title="Delete History">

@@ -4,16 +4,29 @@ Vocabuild is a modern, responsive Progressive Web App (PWA) designed to help you
 
 ![Vocabuild Screenshot](https://i.imgur.com/your-screenshot.png) 
 
-## ✨ Key Features
+## ✨ Features in Detail
 
-- **📚 Add & Manage Words**: Easily add new words with definitions, parts of speech, sample sentences, and helpful mnemonics.
-- **🧠 Customizable Quiz**: Test your knowledge with a random quiz. You can select the number of questions to fit your study session.
-- **📊 Progress Dashboard**: Visualize your learning journey with stats on your total words, mastered words, and words due for review.
-- **🎨 Light & Dark Modes**: Switch between light and dark themes for a comfortable viewing experience in any lighting condition.
-- **📱 Fully Responsive**: Enjoy a seamless experience on any device, from desktops to mobile phones.
-- **🔍 Instant Search**: Quickly find any word in your collection with a powerful and fast search feature.
-- **💾 Data Portability**: Export your entire vocabulary to a JSON file for backup or import it to another device.
-- **📦 PWA Ready**: Install Vocabuild on your device for an app-like experience and offline access.
+- **📚 Comprehensive Word Management**: 
+  - **Add Words**: Easily add new words with definitions, parts of speech, sample sentences, and helpful mnemonics.
+  - **Edit and Delete**: Quickly edit or delete words from your vocabulary.
+  - **Search and Filter**: Instantly find any word in your collection with a powerful search feature. Filter words by tags or view only your favorites.
+
+- **🧠 Intelligent Quiz System**:
+  - **Customizable Quizzes**: Test your knowledge with multiple-choice or typing quizzes. You can select the number of questions and the quiz type (word to meaning, meaning to word) to fit your study session.
+  - **Spaced Repetition (Anki-style)**: The app incorporates a SuperMemo 2 (SM2) algorithm to power its spaced repetition system. Words you answer correctly will reappear less often, while forgotten words will show up more frequently, optimizing your learning efficiency.
+  - **Daily/Weekly Revision Challenge**: Engage in a focused challenge of 10-20 words, prioritizing those due for review. At the end, receive a "Retention Score" to gauge your mastery.
+  - **Flashcard Mode**: Practice words at your own pace with interactive flashcards.
+  - **Quiz History**: Track your progress with a detailed quiz history, including your score and the answers you got right and wrong.
+
+- **📊 Insightful Dashboard**:
+  - **Learning Statistics**: Visualize your learning journey with stats on your total words, mastered words, and words due for review.
+  - **Data Portability**: Export your entire vocabulary to a JSON file for backup or import it to another device.
+
+- **🎨 User-Friendly Interface**:
+  - **Modern & Clean Design**: Enjoy a refreshed UI across the application, including improved layouts, consistent spacing, and enhanced visual feedback for interactions.
+  - **Light & Dark Modes**: Switch between light and dark themes for a comfortable viewing experience in any lighting condition.
+  - **Fully Responsive**: Enjoy a seamless experience on any device, from desktops to mobile phones.
+  - **PWA Ready**: Install Vocabuild on your device for an app-like experience and offline access.
 
 ## 🛠️ Technologies Used
 

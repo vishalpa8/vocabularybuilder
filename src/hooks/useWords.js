@@ -1,8 +1,10 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 
+
 export function useWords() {
   const words = useLiveQuery(() => db.words.toArray(), []);
+  
 
   const addWord = async (word) => {
     try {

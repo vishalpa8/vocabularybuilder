@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import WordList from "../components/WordList";
+import WordOfTheDay from "../components/WordOfTheDay";
 import {
   TextField,
   Box,
@@ -46,8 +47,10 @@ const HomePage = () => {
         </Typography>
       </Box>
 
+      <WordOfTheDay />
+
       {/* Controls: Toggle and Tag Filter in a Row */}
-      <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
+      <Box sx={{ my: 4, display: "flex", justifyContent: "center" }}>
         <Stack
           direction="row"
           spacing={2}
