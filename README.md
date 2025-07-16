@@ -5,19 +5,23 @@ Vocabuild is a modern, streamlined Progressive Web App (PWA) designed to help yo
 ## ✨ Core Features
 
 - **📚 Simple Word Management**:
+
   - **Add Words**: Easily add new words with definitions, parts of speech, and sample sentences.
   - **Word List**: A clean and searchable list of all your words.
 
 - **🧠 Focused Quiz System**:
+
   - **Effective Quizzing**: Test your knowledge with a straightforward Multiple-Choice Quiz (MCQ) system.
   - **Smart Revision**: The app intelligently schedules words for review, helping you focus on what matters most.
   - **"Review Now" Option**: Want to practice a specific word? You have the flexibility to review any word at any time.
 
 - **📊 Simplified Dashboard**:
+
   - **Key Metrics**: Track your progress with a few essential stats: your current learning streak, total words learned, and words up for review next.
   - **Positive Reinforcement**: The dashboard focuses on your achievements to keep you motivated.
 
 - **🏆 Streamlined Badges**:
+
   - Earn badges for core milestones like adding your first words, maintaining a study streak, and mastering new vocabulary.
 
 - **🎨 User-Friendly Interface**:
@@ -46,12 +50,14 @@ To get a local copy up and running, follow these simple steps.
 ### Installation
 
 1.  **Clone the repository:**
+
     ```sh
     git clone https://github.com/your-username/vocabulary-builder.git
     cd vocabulary-builder
     ```
 
 2.  **Install NPM packages:**
+
     ```sh
     npm install
     ```
@@ -60,7 +66,7 @@ To get a local copy up and running, follow these simple steps.
     ```sh
     npm run dev
     ```
-    The application will be available at `http://localhost:5173`.
+    The application will be available at `https://vocabularbuilder8.netlify.app/`.
 
 ## 🤝 Contributing
 
