@@ -237,7 +237,7 @@ const Quiz = () => {
     updateWord(currentWord.id, {
       nextReview, easinessFactor, repetition, streak, isLearned,
       lastReviewed: new Date(),
-      points: (currentWord.points || 0) + (isCorrect ? 10 : 0),
+      points: (currentWord.points || 0) + (isCorrect ? 1 : 0),
     });
 
     // Record results

@@ -46,7 +46,49 @@ const Badges = () => {
         <Grid container spacing={2} justifyContent="center">
           {badges.map((badge) => (
             <Grid item key={badge.id}>
-              <Tooltip title={`${badge.name}: ${badge.description}`}>
+              <Tooltip 
+                title={(
+                  <Box 
+                    sx={{
+                      p: 1.5,
+                      minWidth: 200,
+                      maxWidth: 300,
+                      bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.9)' : '#e3f2fd',
+                      borderRadius: 2,
+                      border: (theme) => theme.palette.mode === 'dark' 
+                        ? '1px solid rgba(255,215,0,0.4)' 
+                        : '1px solid rgba(255,215,0,0.3)',
+                      boxShadow: (theme) => theme.palette.mode === 'dark'
+                        ? '0 4px 20px rgba(255,215,0,0.2)'
+                        : '0 4px 20px rgba(255,215,0,0.15)',
+                    }}
+                  >
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: (theme) => theme.palette.mode === 'dark' ? 'gold' : '#ed6c02' }}>
+                      {badge.name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 0.5, color: (theme) => theme.palette.mode === 'dark' ? 'grey.300' : 'grey.700' }}>
+                      {badge.description}
+                    </Typography>
+                    <Typography variant="caption" sx={{ mt: 1, display: 'block', color: (theme) => theme.palette.mode === 'dark' ? 'grey.500' : 'grey.500' }}>
+                      Earned: {new Date(badge.dateEarned).toLocaleDateString('en-GB')}
+                    </Typography>
+                  </Box>
+                )}
+                arrow
+                placement="top"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      bgcolor: 'transparent',
+                      maxWidth: 'none',
+                      p: 0,
+                      '& .MuiTooltip-arrow': {
+                        color: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.9)' : '#e3f2fd',
+                      },
+                    },
+                  },
+                }}
+              >
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
                   <EmojiEvents sx={{ fontSize: 60, color: "gold", mb: 0.5 }} />
                   <Typography variant="caption" sx={{ fontWeight: 600 }}>{badge.name}</Typography>

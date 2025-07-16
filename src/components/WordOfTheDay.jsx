@@ -6,7 +6,8 @@ import {
   Modal, 
   IconButton,
   Fade,
-  Backdrop
+  Backdrop,
+  Button
 } from "@mui/material";
 import { WbSunny, Close } from "@mui/icons-material";
 
@@ -42,7 +43,53 @@ const WordOfTheDay = ({ open, onClose }) => {
     }
   };
 
-  if (!words || !wordOfTheDay) {
+  if (!words || words.length === 0) {
+    return (
+      <Modal
+        open={open}
+        onClose={onClose}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={open}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: { xs: '90%', sm: '80%', md: '400px' },
+              bgcolor: 'background.paper',
+              borderRadius: 3,
+              boxShadow: 24,
+              p: 4,
+              outline: 'none',
+              textAlign: 'center',
+            }}
+          >
+            <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+              No Words Available
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Please add some words to your vocabulary to get a Word of the Day!
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={onClose}
+              sx={{ mt: 3 }}
+            >
+              Close
+            </Button>
+          </Box>
+        </Fade>
+      </Modal>
+    );
+  }
+
+  if (!wordOfTheDay) {
     return null;
   }
 
@@ -109,7 +156,7 @@ const WordOfTheDay = ({ open, onClose }) => {
                 mb: 2,
               }}
             >
-              <WbSunny sx={{ fontSize: 46, color: "orange" }} />
+              <WbSunny sx={{ fontSize: 46, color: "primary.main" }} />
               <Typography
                 variant="h3"
                 component="div"
@@ -117,6 +164,7 @@ const WordOfTheDay = ({ open, onClose }) => {
                 sx={{
                   textAlign: "center",
                   wordBreak: "break-word",
+                  color: "primary.main",
                 }}
               >
                 {wordOfTheDay.word}

@@ -31,6 +31,7 @@ import {
 import InfoModal from "./InfoModal";
 import Badges from "./Badges";
 import { downloadJson, uploadJson, exampleJSON } from "../utils/fileUtils";
+import Reset from "./Reset";
 import { normalizeWordKey } from "../utils/wordUtils";
 import { badgeCriteria } from "../utils/badgeUtils";
 
@@ -635,9 +636,9 @@ const Dashboard = () => {
     let wordsDueForReview = 0;
 
     // Single pass through words for all calculations
-    words.forEach(word => {
+    words.forEach((word) => {
       totalPoints += word.points || 0;
-      
+
       if (word.isLearned) {
         wordsLearned++;
       } else if (new Date(word.nextReview) <= now) {
@@ -661,37 +662,243 @@ const Dashboard = () => {
     );
   }
 
-  const { totalWords, wordsLearned, wordsDueForReview, totalPoints } = dashboardStats;
+  const { totalWords, wordsLearned, wordsDueForReview, totalPoints } =
+    dashboardStats;
 
-  const StatCard = ({ title, value, icon }) => (
-    <Grid item xs={12} sm={6} md={3}>
-      <Paper
-        sx={{
-          p: 3,
-          display: "flex",
-          alignItems: "center",
-          gap: 2,
-          borderRadius: 2,
-          height: "100%",
-          minHeight: 120,
-          transition: "transform 0.2s, box-shadow 0.2s",
-          "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: (theme) => theme.shadows[4],
-          },
-        }}
-        elevation={2}
-      >
-        {icon}
-        <Box>
-          <Typography variant="h4" component="div" fontWeight="bold">
-            {value}
+  const StatCard = ({ title, value, icon, tooltip, color = "primary" }) => {
+    const getTooltipContent = () => {
+      const iconColor = icon.props.color || color;
+      const themeColors = {
+        primary: { main: "#1976d2", light: "#42a5f5", bg: "#e3f2fd" },
+        success: { main: "#2e7d32", light: "#66bb6a", bg: "#e8f5e8" },
+        error: { main: "#d32f2f", light: "#ef5350", bg: "#ffebee" },
+        warning: { main: "#ed6c02", light: "#ffb74d", bg: "#fff3e0" },
+      };
+
+      const colorScheme = themeColors[iconColor] || themeColors.primary;
+
+      return (
+        <Box
+          sx={{
+            p: 2,
+            minWidth: 200,
+            maxWidth: 240,
+            bgcolor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "rgba(0,0,0,0.9)"
+                : colorScheme.bg,
+            borderRadius: 2,
+            border: (theme) =>
+              theme.palette.mode === "dark"
+                ? `1px solid ${colorScheme.main}40`
+                : `1px solid ${colorScheme.main}30`,
+            boxShadow: (theme) =>
+              theme.palette.mode === "dark"
+                ? `0 4px 20px ${colorScheme.main}20`
+                : `0 4px 20px ${colorScheme.main}15`,
+          }}
+        >
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}
+          >
+            <Box
+              sx={{
+                p: 1,
+                borderRadius: 1.5,
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? `${colorScheme.main}20`
+                    : `${colorScheme.main}10`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {React.cloneElement(icon, {
+                sx: { fontSize: 20, color: colorScheme.main },
+              })}
+            </Box>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "#fff" : colorScheme.main,
+                fontSize: "1.1rem",
+              }}
+            >
+              {title}
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+            <Chip
+              label={value}
+              size="small"
+              sx={{
+                bgcolor: colorScheme.main,
+                color: "white",
+                fontWeight: 600,
+                fontSize: "0.875rem",
+                minWidth: 40,
+              }}
+            />
+            <Typography
+              variant="body2"
+              sx={{
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "grey.300" : "grey.700",
+                fontWeight: 500,
+              }}
+            >
+              {title === "Total Words"
+                ? "words in your vocabulary"
+                : title === "Words Mastered"
+                ? "words you've learned"
+                : title === "Due for Review"
+                ? "words need review"
+                : title === "Total Points"
+                ? "points earned"
+                : ""}
+            </Typography>
+          </Box>
+
+          <Typography
+            variant="body2"
+            sx={{
+              color: (theme) =>
+                theme.palette.mode === "dark" ? "grey.400" : "grey.600",
+              lineHeight: 1.4,
+              fontSize: "0.8rem",
+            }}
+          >
+            {tooltip}
           </Typography>
-          <Typography color="text.secondary">{title}</Typography>
         </Box>
-      </Paper>
-    </Grid>
-  );
+      );
+    };
+
+    return (
+      <Grid item xs={12} sm={6} md={3}>
+        <Tooltip
+          title={getTooltipContent()}
+          arrow
+          placement="top"
+          componentsProps={{
+            tooltip: {
+              sx: {
+                bgcolor: "transparent",
+                maxWidth: "none",
+                p: 0,
+                "& .MuiTooltip-arrow": {
+                  color: (theme) =>
+                    theme.palette.mode === "dark" ? "rgba(0,0,0,0.9)" : "#fff",
+                },
+              },
+            },
+          }}
+        >
+          <Paper
+            sx={{
+              p: 3,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              borderRadius: 3,
+              height: "100%",
+              minHeight: 120,
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              cursor: "pointer",
+              position: "relative",
+              overflow: "hidden",
+              "&:hover": {
+                transform: "translateY(-6px) scale(1.02)",
+                boxShadow: (theme) =>
+                  `0 8px 25px -5px ${
+                    theme.palette.mode === "dark"
+                      ? "rgba(0,0,0,0.4)"
+                      : "rgba(0,0,0,0.15)"
+                  }`,
+              },
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "4px",
+                background: `linear-gradient(90deg, ${
+                  icon.props.color === "primary"
+                    ? "#1976d2"
+                    : icon.props.color === "success"
+                    ? "#2e7d32"
+                    : icon.props.color === "error"
+                    ? "#d32f2f"
+                    : "#ed6c02"
+                }, ${
+                  icon.props.color === "primary"
+                    ? "#42a5f5"
+                    : icon.props.color === "success"
+                    ? "#66bb6a"
+                    : icon.props.color === "error"
+                    ? "#ef5350"
+                    : "#ffb74d"
+                })`,
+                opacity: 0.8,
+              },
+            }}
+            elevation={3}
+          >
+            <Box
+              sx={{
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.04)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {icon}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography
+                variant="h4"
+                component="div"
+                fontWeight="700"
+                sx={{
+                  mb: 0.5,
+                  background: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "linear-gradient(135deg, #fff 0%, #e0e0e0 100%)"
+                      : "linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                {value}
+              </Typography>
+              <Typography
+                color="text.secondary"
+                variant="body2"
+                sx={{
+                  fontWeight: 500,
+                  fontSize: "0.875rem",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                {title}
+              </Typography>
+            </Box>
+          </Paper>
+        </Tooltip>
+      </Grid>
+    );
+  };
 
   return (
     <Box>
@@ -711,21 +918,25 @@ const Dashboard = () => {
           title="Total Words"
           value={totalWords}
           icon={<Book sx={{ fontSize: 40 }} color="primary" />}
+          tooltip="The total number of words you have added to your vocabulary."
         />
         <StatCard
           title="Words Mastered"
           value={wordsLearned}
           icon={<School sx={{ fontSize: 40 }} color="success" />}
+          tooltip="Words you have marked as 'learned' after successful quizzes."
         />
         <StatCard
           title="Due for Review"
           value={wordsDueForReview}
           icon={<Schedule sx={{ fontSize: 40 }} color="error" />}
+          tooltip="Words that are scheduled for you to review again based on spaced repetition."
         />
         <StatCard
           title="Total Points"
           value={totalPoints}
           icon={<Star sx={{ fontSize: 40 }} color="warning" />}
+          tooltip="Your total score from quizzes. Earn points for correct answers!"
         />
       </Grid>
 
@@ -738,7 +949,7 @@ const Dashboard = () => {
           p: { xs: 3, sm: 5 }, // Increased padding
           mt: 4, // Increased top margin
           borderRadius: 3, // More rounded corners
-          maxWidth: 600,
+          maxWidth: 800,
           mx: "auto",
           textAlign: "center",
           boxShadow: 6, // More prominent shadow
@@ -757,14 +968,56 @@ const Dashboard = () => {
           sx={{ mb: 1 }}
         >
           <Button
-            variant="outlined"
+            variant="contained"
             onClick={handleExport}
             startIcon={<Download />}
+            sx={{
+              minWidth: 160,
+              height: 48,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: "none",
+              fontSize: "0.95rem",
+              bgcolor: "primary.main",
+              color: "white",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&:hover": {
+                bgcolor: "primary.dark",
+                transform: "translateY(-2px)",
+                boxShadow: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "0 8px 25px -5px rgba(25, 118, 210, 0.4)"
+                    : "0 8px 25px -5px rgba(25, 118, 210, 0.35)",
+              },
+            }}
           >
-            Export to JSON
+            Export JSON
           </Button>
-          <Button variant="outlined" component="label" startIcon={<Upload />}>
-            Import from JSON
+          <Button
+            variant="contained"
+            component="label"
+            startIcon={<Upload />}
+            sx={{
+              minWidth: 160,
+              height: 48,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: "none",
+              fontSize: "0.95rem",
+              bgcolor: "success.main",
+              color: "white",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&:hover": {
+                bgcolor: "success.dark",
+                transform: "translateY(-2px)",
+                boxShadow: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "0 8px 25px -5px rgba(46, 125, 50, 0.4)"
+                    : "0 8px 25px -5px rgba(46, 125, 50, 0.35)",
+              },
+            }}
+          >
+            Import JSON
             <input
               type="file"
               accept=".json"
@@ -774,13 +1027,31 @@ const Dashboard = () => {
           </Button>
           <Button
             variant="contained"
-            color="secondary"
             onClick={handleShowInfo}
             endIcon={<Info />}
-            sx={{ fontWeight: 500, px: 2.2 }}
+            sx={{
+              minWidth: 160,
+              height: 48,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: "none",
+              fontSize: "0.95rem",
+              bgcolor: "warning.main",
+              color: "white",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&:hover": {
+                bgcolor: "warning.dark",
+                transform: "translateY(-2px)",
+                boxShadow: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "0 8px 25px -5px rgba(237, 108, 2, 0.4)"
+                    : "0 8px 25px -5px rgba(237, 108, 2, 0.35)",
+              },
+            }}
           >
             Format Info
           </Button>
+          <Reset />
         </Stack>
       </Paper>
 

@@ -158,7 +158,7 @@ const Navbar = () => {
           <Box sx={{ flexGrow: 1 }} />
           {isMobile ? (
             <>
-              <IconButton onClick={handleWordOfTheDayToggle} color="inherit">
+              <IconButton onClick={(e) => { e.currentTarget.blur(); handleWordOfTheDayToggle(); }} color="inherit">
                 <WbSunny />
               </IconButton>
               <IconButton onClick={toggleTheme} color="inherit">
@@ -187,7 +187,7 @@ const Navbar = () => {
                 </Button>
               ))}
               <Button
-                onClick={handleWordOfTheDayToggle}
+                onClick={(e) => { e.currentTarget.blur(); handleWordOfTheDayToggle(); }}
                 variant="contained"
                 startIcon={<WbSunny />}
                 sx={{

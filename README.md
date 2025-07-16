@@ -30,6 +30,10 @@ Vocabuild is a modern, streamlined Progressive Web App (PWA) designed to help yo
   - **Fully Responsive**: Use Vocabuild on any device, from desktop to mobile.
   - **PWA Ready**: Install Vocabuild on your device for an app-like experience and offline access.
 
+## 🏆 Gamification
+
+- **Point System**: Earn 10 points for every word you answer correctly in a quiz. Your total points are displayed on the dashboard, providing a simple metric of your learning progress.
+
 ## 🛠️ Technologies Used
 
 - **Framework**: [React](https://reactjs.org/)
