@@ -1,31 +1,29 @@
 # Vocabuild: Your Personal Vocabulary Builder
 
-Vocabuild is a modern, responsive Progressive Web App (PWA) designed to help you build, manage, and master your personal vocabulary. It uses a flexible quiz system to create an effective and engaging learning experience.
+Vocabuild is a modern, streamlined Progressive Web App (PWA) designed to help you build and master your personal vocabulary through a simple and effective learning experience.
 
-![Vocabuild Screenshot](https://i.imgur.com/your-screenshot.png) 
+## ✨ Core Features
 
-## ✨ Features in Detail
+- **📚 Simple Word Management**:
+  - **Add Words**: Easily add new words with definitions, parts of speech, and sample sentences.
+  - **Word List**: A clean and searchable list of all your words.
 
-- **📚 Comprehensive Word Management**: 
-  - **Add Words**: Easily add new words with definitions, parts of speech, sample sentences, and helpful mnemonics.
-  - **Edit and Delete**: Quickly edit or delete words from your vocabulary.
-  - **Search and Filter**: Instantly find any word in your collection with a powerful search feature. Filter words by tags or view only your favorites.
+- **🧠 Focused Quiz System**:
+  - **Effective Quizzing**: Test your knowledge with a straightforward Multiple-Choice Quiz (MCQ) system.
+  - **Smart Revision**: The app intelligently schedules words for review, helping you focus on what matters most.
+  - **"Review Now" Option**: Want to practice a specific word? You have the flexibility to review any word at any time.
 
-- **🧠 Intelligent Quiz System**:
-  - **Customizable Quizzes**: Test your knowledge with multiple-choice or typing quizzes. You can select the number of questions and the quiz type (word to meaning, meaning to word) to fit your study session.
-  - **Spaced Repetition (Anki-style)**: The app incorporates a SuperMemo 2 (SM2) algorithm to power its spaced repetition system. Words you answer correctly will reappear less often, while forgotten words will show up more frequently, optimizing your learning efficiency.
-  - **Daily/Weekly Revision Challenge**: Engage in a focused challenge of 10-20 words, prioritizing those due for review. At the end, receive a "Retention Score" to gauge your mastery.
-  - **Flashcard Mode**: Practice words at your own pace with interactive flashcards.
-  - **Quiz History**: Track your progress with a detailed quiz history, including your score and the answers you got right and wrong.
+- **📊 Simplified Dashboard**:
+  - **Key Metrics**: Track your progress with a few essential stats: your current learning streak, total words learned, and words up for review next.
+  - **Positive Reinforcement**: The dashboard focuses on your achievements to keep you motivated.
 
-- **📊 Insightful Dashboard**:
-  - **Learning Statistics**: Visualize your learning journey with stats on your total words, mastered words, and words due for review.
-  - **Data Portability**: Export your entire vocabulary to a JSON file for backup or import it to another device.
+- **🏆 Streamlined Badges**:
+  - Earn badges for core milestones like adding your first words, maintaining a study streak, and mastering new vocabulary.
 
 - **🎨 User-Friendly Interface**:
-  - **Modern & Clean Design**: Enjoy a refreshed UI across the application, including improved layouts, consistent spacing, and enhanced visual feedback for interactions.
-  - **Light & Dark Modes**: Switch between light and dark themes for a comfortable viewing experience in any lighting condition.
-  - **Fully Responsive**: Enjoy a seamless experience on any device, from desktops to mobile phones.
+  - **Modern & Clean Design**: Enjoy a simple and intuitive interface.
+  - **Light & Dark Modes**: Switch between light and dark themes for comfort.
+  - **Fully Responsive**: Use Vocabuild on any device, from desktop to mobile.
   - **PWA Ready**: Install Vocabuild on your device for an app-like experience and offline access.
 
 ## 🛠️ Technologies Used
@@ -62,18 +60,11 @@ To get a local copy up and running, follow these simple steps.
     ```sh
     npm run dev
     ```
-    The application will be available at `http://localhost:5173` (or another port if 5173 is busy).
-
-## 📖 How to Use
-
-- **Adding a Word**: Navigate to the **Add Word** page from the navbar. Fill in the details and save the word to your collection.
-- **Taking a Quiz**: Go to the **Quiz** page. Select the number of questions you'd like to answer and click "Start Test" to begin a random quiz from your vocabulary.
-- **Viewing Your Words**: The **Home** page displays your entire vocabulary. You can use the search bar to filter for specific words.
-- **Managing Your Data**: On the **Dashboard**, you can see your learning statistics and use the **Export** and **Import** buttons to manage your vocabulary data.
+    The application will be available at `http://localhost:5173`.
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/your-username/vocabulary-builder/issues).
+Contributions, issues, and feature requests are welcome!
 
 ## 📄 License
 

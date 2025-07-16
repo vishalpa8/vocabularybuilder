@@ -1,24 +1,43 @@
-// Spaced repetition intervals (in days) - SM2 algorithm implementation
+// Spaced repetition intervals (in days) - Enhanced SM2 algorithm implementation
 export const sm2 = (word, quality) => {
-  let { easinessFactor, repetition, streak } = word;
+  let { easinessFactor, repetition, streak, repetitionCount } = word;
 
+  // Initialize default values
   easinessFactor = easinessFactor || 2.5;
   repetition = repetition || 0;
   streak = streak || 0;
+  repetitionCount = repetitionCount || 0;
+
+  let nextRepetition;
 
   if (quality >= 3) { // Correct response
     streak += 1;
-    repetition = 3; // Always set to 3 days for revision
+    repetitionCount += 1;
+    
+    // Calculate next repetition interval based on SM2 algorithm
+    if (repetitionCount === 1) {
+      nextRepetition = 1; // First review after 1 day
+    } else if (repetitionCount === 2) {
+      nextRepetition = 6; // Second review after 6 days
+    } else {
+      // For subsequent reviews, multiply previous interval by easiness factor
+      nextRepetition = Math.round(repetition * easinessFactor);
+    }
+    
+    repetition = nextRepetition;
   } else { // Incorrect response
     streak = 0;
-    repetition = 3; // Reset to 3 days for revision
+    repetitionCount = 0; // Reset repetition count on failure
+    repetition = 1; // Start over with 1 day interval
   }
 
+  // Update easiness factor based on quality (SM2 formula)
   easinessFactor += (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
   if (easinessFactor < 1.3) {
     easinessFactor = 1.3;
   }
 
+  // Calculate next review date
   const nextReview = new Date();
   nextReview.setDate(nextReview.getDate() + repetition);
 
@@ -26,6 +45,7 @@ export const sm2 = (word, quality) => {
     nextReview,
     easinessFactor,
     repetition,
+    repetitionCount,
     streak,
     isLearned: streak >= 10,
   };

@@ -1,28 +1,17 @@
 export const badgeCriteria = [
   {
+    name: "First Step",
+    description: "Add your first word.",
+    condition: (words) => words.length >= 1,
+  },
+  {
     name: "Word Collector",
-    description: "Add your first 10 words.",
+    description: "Add 10 words.",
     condition: (words) => words.length >= 10,
   },
   {
-    name: "Word Hoarder",
-    description: "Add 50 words.",
-    condition: (words) => words.length >= 50,
-  },
-  {
-    name: "Word Master",
-    description: "Master your first 10 words.",
-    condition: (words) => words.filter((word) => word.isLearned).length >= 10,
-  },
-  {
-    name: "Point Collector",
-    description: "Earn 1000 points.",
-    condition: (words) =>
-      words.reduce((acc, word) => acc + (word.points || 0), 0) >= 1000,
-  },
-  {
-    name: "Daily Reviser",
-    description: "Revise words for 3 consecutive days.",
+    name: "Dedicated Learner",
+    description: "Complete a quiz for 3 consecutive days.",
     condition: () => {
       const history = JSON.parse(localStorage.getItem("quizHistory") || "[]");
       if (history.length < 3) return false;
@@ -39,5 +28,18 @@ export const badgeCriteria = [
 
       return uniqueDates.includes(today) && uniqueDates.includes(yesterday) && uniqueDates.includes(twoDaysAgo);
     },
+  },
+  {
+    name: "Quiz Whiz",
+    description: "Score 100% on a quiz.",
+    condition: () => {
+      const history = JSON.parse(localStorage.getItem("quizHistory") || "[]");
+      return history.some(item => (item.score / item.total) * 100 === 100);
+    },
+  },
+  {
+    name: "Word Master",
+    description: "Learn 25 words.",
+    condition: (words) => words.filter((word) => word.isLearned).length >= 25,
   },
 ];
