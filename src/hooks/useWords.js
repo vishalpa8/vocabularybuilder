@@ -1,12 +1,23 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 export function useWords() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   
-  const words = useLiveQuery(() => db.words.orderBy('word').toArray(), []);
+  const words = useLiveQuery(() => db.words.toArray(), []);
+
+  // Shuffle the words to display them in random order
+  const shuffledWords = useMemo(() => {
+    if (!words) return [];
+    const array = [...words];
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }, [words]);
 
   const handleError = useCallback((error, operation) => {
     console.error(`Failed to ${operation}:`, error);
@@ -82,7 +93,7 @@ export function useWords() {
   const clearError = useCallback(() => setError(null), []);
 
   return {
-    words,
+    words: shuffledWords,
     addWord,
     updateWord,
     deleteWord,

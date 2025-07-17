@@ -8,7 +8,6 @@ import {
   Paper,
   Stack,
   Fade,
-  Zoom,
   Chip,
 } from "@mui/material";
 import { 
@@ -50,8 +49,7 @@ const QuizMCQ = ({
 
   
 
-  // Generate unique keys for options
-  const getOptionKey = (option, idx) => `${option}-${idx}`;
+  
 
   // Option card style
   const getOptionCardStyle = (option) => {
@@ -162,7 +160,7 @@ const QuizMCQ = ({
         </Box>
 
         {/* Question Card */}
-        <Zoom in style={{ transitionDelay: '100ms' }}>
+        <Fade in key={currentWord.word}>
           <Card 
             elevation={6} 
             sx={{ 
@@ -232,7 +230,7 @@ const QuizMCQ = ({
               )}
             </CardContent>
           </Card>
-        </Zoom>
+        </Fade>
 
         {/* Options */}
         <Stack spacing={2} sx={{ mt: 2 }}>
@@ -241,12 +239,8 @@ const QuizMCQ = ({
             const isSelectedAnswer = option === selectedAnswer;
             
             return (
-              <Zoom 
-                in 
-                key={getOptionKey(option, idx)}
-                style={{ transitionDelay: `${200 + idx * 100}ms` }}
-              >
                 <Paper
+                  key={idx}
                   elevation={isAnswered && (isCorrectAnswer || isSelectedAnswer) ? 4 : 2}
                   component="button"
                   role="button"
@@ -257,7 +251,6 @@ const QuizMCQ = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    transition: 'all 0.3s ease',
                     '&:hover': !isAnswered ? {
                       transform: 'translateY(-2px)',
                       boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
@@ -301,7 +294,6 @@ const QuizMCQ = ({
                     )}
                   </Box>
                 </Paper>
-              </Zoom>
             );
           })}
         </Stack>
