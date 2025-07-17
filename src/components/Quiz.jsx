@@ -64,14 +64,13 @@ if (typeof document !== 'undefined' && !document.querySelector('#quiz-pulse-anim
 }
 
 const Quiz = () => {
-  const { words, updateWord } = useWords();
+  const { words, loading, error, updateWord } = useWords();
   const [quizWords, setQuizWords] = useState([]);
   const [lastQuizWords, setLastQuizWords] = useState(null);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   
   const [options, setOptions] = useState([]);
   const [quizResults, setQuizResults] = useState([]);
-  const [quizLimit, setQuizLimit] = useState(10);
   const [quizMode, setQuizMode] = useState("quiz");
   const [quizType, setQuizType] = useState("wordToMeaning");
   const [modalState, setModalState] = useState({ open: false, title: "", message: "" });
@@ -137,12 +136,12 @@ const Quiz = () => {
   useEffect(() => {
     if (quizStatus === "answering" && quizWords.length > 0) {
       const currentWord = quizWords[currentWordIndex];
-      if (quizMode === 'quiz' || quizMode === 'revision') {
+      if (selectedQuizMode === 'quiz' || selectedQuizMode === 'revision') {
         const generatedOptions = generateOptions(currentWord, words, quizType);
         setOptions(generatedOptions);
       }
     }
-  }, [quizStatus, quizWords, currentWordIndex, words, quizType, quizMode]);
+  }, [quizStatus, quizWords, currentWordIndex, words, quizType, selectedQuizMode]);
 
   // This useEffect is the core of the quiz progression logic
   useEffect(() => {
@@ -173,37 +172,45 @@ const Quiz = () => {
     return () => clearTimeout(timer);
   }, [quizStatus, currentWordIndex, quizWords.length, quizResults, quizMode]);
 
-
-  const startQuiz = () => {
+  const startQuiz = (mode, limit) => {
     const totalWords = words ? words.length : 0;
-    if (((quizMode === 'quiz' || quizMode === 'revision') && totalWords < 4) || (quizMode !== 'quiz' && quizMode !== 'revision' && totalWords < 1)) {
+    if (((mode === 'quiz' || mode === 'revision') && totalWords < 4) || (mode !== 'quiz' && mode !== 'revision' && totalWords < 1)) {
       setModalState({
         open: true,
         title: "Not Enough Words",
-        message: `A ${quizMode} session requires at least ${(quizMode === 'quiz' || quizMode === 'revision') ? 4 : 1} words. You have ${totalWords}.`,
+        message: `A ${mode} session requires at least ${mode === 'quiz' || mode === 'revision' ? 4 : 1} words. You have ${totalWords}.`,
         type: "info",
       });
       return;
     }
 
-    const actualQuizSize = Math.min(totalWords, quizLimit);
+    const actualQuizSize = Math.min(totalWords, limit);
     let wordsForSession;
-    if (quizMode === 'flashcards') {
+    if (mode === 'flashcards') {
       wordsForSession = getWordsForFlashcards(words, actualQuizSize);
-    } else if (quizMode === 'revision') {
+    } else if (mode === 'revision') {
       wordsForSession = getWordsForRevisionChallenge(words, actualQuizSize);
     } else {
       wordsForSession = getWordsForQuiz(words, actualQuizSize);
     }
-    
-    setQuizWords(wordsForSession);
-    setLastQuizWords(wordsForSession);
-    setCurrentWordIndex(0);
-    setQuizResults([]);
-    setSelectedAnswer(null);
-    setTypingAttempts(0);
-    setTimeLeft(300); // Reset timer to 5:00
-    setQuizStatus("answering");
+
+    if (wordsForSession && wordsForSession.length > 0) {
+      setQuizWords(wordsForSession);
+      setLastQuizWords(wordsForSession);
+      setCurrentWordIndex(0);
+      setQuizResults([]);
+      setSelectedAnswer(null);
+      setTypingAttempts(0);
+      setTimeLeft(300); // Reset timer to 5:00
+      setQuizStatus("answering");
+    } else {
+      setModalState({
+        open: true,
+        title: "Quiz Error",
+        message: "Could not load words for the quiz. Please try again.",
+        type: "error",
+      });
+    }
   };
 
   const handleAnswer = (answer) => {
@@ -269,6 +276,14 @@ const Quiz = () => {
       setCurrentWordIndex(currentWordIndex - 1);
     }
   };
+
+  if (loading) {
+    return <Box sx={{ display: "flex", justifyContent: "center" }}><CircularProgress /></Box>;
+  }
+
+  if (error) {
+    return <Box sx={{ textAlign: "center", mt: 3 }}><Typography color="error">Failed to load words: {error.message}</Typography></Box>;
+  }
 
   if (!words) {
     return <Box sx={{ display: "flex", justifyContent: "center" }}><CircularProgress /></Box>;
@@ -605,22 +620,11 @@ const Quiz = () => {
                     size="large" 
                     onClick={() => {
                       setQuizMode(selectedQuizMode);
-                      setQuizLimit(tempQuizLimit);
                       setQuizType(tempQuizType);
                       setConfigModalOpen(false);
                       // Start quiz immediately after configuration
                       setTimeout(() => {
-                        const totalWords = words.length;
-                        if (((selectedQuizMode === 'quiz' || selectedQuizMode === 'revision') && totalWords < 4) || (selectedQuizMode !== 'quiz' && selectedQuizMode !== 'revision' && totalWords < 1)) {
-                          setModalState({
-                            open: true,
-                            title: "Not Enough Words",
-                            message: `A ${selectedQuizMode} session requires at least ${(selectedQuizMode === 'quiz' || selectedQuizMode === 'revision') ? 4 : 1} words. You have ${totalWords}.`,
-                            type: "info",
-                          });
-                          return;
-                        }
-                        startQuiz();
+                        startQuiz(selectedQuizMode, tempQuizLimit);
                       }, 100);
                     }}
                     disabled={((selectedQuizMode === 'quiz' || selectedQuizMode === 'revision') && totalWords < 4) || (selectedQuizMode !== 'quiz' && selectedQuizMode !== 'revision' && totalWords < 1)}

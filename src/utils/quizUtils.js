@@ -72,20 +72,24 @@ export function filterOldHistory(history, days = 30) {
 }
 
 export const getWordsForQuiz = (words, limit) => {
+  console.log("getWordsForQuiz called with:", { words, limit });
   if (!words || words.length === 0) return [];
 
   // Separate words into categories
   const now = new Date();
+  const newWords = words.filter((word) => !word.lastReviewed);
   const dueForReview = words.filter(
-    (word) => !word.isLearned && new Date(word.nextReview) <= now
+    (word) => word.lastReviewed && !word.isLearned && new Date(word.nextReview) <= now
   );
   const notDue = words.filter(
-    (word) => !word.isLearned && new Date(word.nextReview) > now
+    (word) => word.lastReviewed && !word.isLearned && new Date(word.nextReview) > now
   );
   const learned = words.filter((word) => word.isLearned);
 
-  // Prioritize due words, then not-due, then learned words
-  let quizWords = [...dueForReview];
+  console.log("Categorized words:", { newWords, dueForReview, notDue, learned });
+
+  // Prioritize new words, then due, then not-due, then learned
+  let quizWords = [...newWords, ...dueForReview];
 
   if (quizWords.length < limit) {
     quizWords = [...quizWords, ...notDue];
@@ -94,12 +98,16 @@ export const getWordsForQuiz = (words, limit) => {
     quizWords = [...quizWords, ...learned];
   }
 
+  console.log("Combined quizWords before shuffle:", quizWords);
+
   // Shuffle the combined list and take the required number of words
   const shuffled = quizWords.sort(() => 0.5 - Math.random());
   
   // Ensure unique words
   const uniqueWords = Array.from(new Set(shuffled.map(w => w.id)))
     .map(id => shuffled.find(w => w.id === id));
+
+  console.log("Final unique words:", uniqueWords.slice(0, limit));
 
   return uniqueWords.slice(0, limit);
 };
@@ -118,38 +126,28 @@ export const getWordsForRevisionChallenge = (words, limit = 15) => {
   const now = new Date();
   const maxWords = Math.min(limit, words.length);
 
-  // 1. Prioritize words due for review (not learned and nextReview <= today)
-  let dueForReview = words.filter(
-    (word) => !word.isLearned && new Date(word.nextReview) <= now
+  const newWords = words.filter((word) => !word.lastReviewed);
+  const dueForReview = words.filter(
+    (word) => word.lastReviewed && !word.isLearned && new Date(word.nextReview) <= now
   );
+  const notDueUnlearned = words.filter(
+    (word) => word.lastReviewed && !word.isLearned && new Date(word.nextReview) > now
+  );
+  const learned = words.filter((word) => word.isLearned);
 
-  // Shuffle due words to ensure randomness if more are available than needed
-  dueForReview = dueForReview.sort(() => 0.5 - Math.random());
+  // Prioritize due words, then new words, then not-due, then learned
+  const potentialWords = [
+    ...dueForReview.sort(() => 0.5 - Math.random()),
+    ...newWords.sort(() => 0.5 - Math.random()),
+    ...notDueUnlearned.sort(() => 0.5 - Math.random()),
+    ...learned.sort(() => 0.5 - Math.random())
+  ];
 
-  let selectedWords = dueForReview.slice(0, maxWords);
+  // Ensure unique words and take the limit
+  const uniqueWords = Array.from(new Set(potentialWords.map(w => w.id)))
+    .map(id => potentialWords.find(w => w.id === id));
 
-  // 2. If not enough due words, fill with unlearned words not yet due
-  if (selectedWords.length < maxWords) {
-    const notDueUnlearned = words.filter(
-      (word) => !word.isLearned && new Date(word.nextReview) > now && !selectedWords.some(sw => sw.id === word.id)
-    );
-    const shuffledNotDue = notDueUnlearned.sort(() => 0.5 - Math.random());
-    const needed = maxWords - selectedWords.length;
-    selectedWords = [...selectedWords, ...shuffledNotDue.slice(0, needed)];
-  }
-
-  // 3. If still not enough, fill with any remaining words (e.g., learned words, if necessary)
-  if (selectedWords.length < maxWords) {
-    const remainingWords = words.filter(
-      (word) => !selectedWords.some(sw => sw.id === word.id)
-    );
-    const shuffledRemaining = remainingWords.sort(() => 0.5 - Math.random());
-    const needed = maxWords - selectedWords.length;
-    selectedWords = [...selectedWords, ...shuffledRemaining.slice(0, needed)];
-  }
-
-  // Final shuffle to mix prioritized and filled words
-  return selectedWords.sort(() => 0.5 - Math.random());
+  return uniqueWords.slice(0, maxWords);
 };
 
 export const generateOptions = (correctWord, allWords, type = 'wordToMeaning') => {
