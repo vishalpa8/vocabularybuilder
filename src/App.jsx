@@ -10,6 +10,7 @@ import Layout from './components/Layout';
 
 // Lazy load pages
 const HomePage = React.lazy(() => import('./pages/HomePage'));
+const PrivacyPolicy = React.lazy(() => import('./components/PrivacyPolicy'));
 const AddWordPage = React.lazy(() => import('./pages/AddWordPage'));
 const QuizPage = React.lazy(() => import('./pages/QuizPage'));
 const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
@@ -55,6 +56,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingFallback />}>
             <DashboardPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "privacy-policy",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <PrivacyPolicy />
           </Suspense>
         ),
       },

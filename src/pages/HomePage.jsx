@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import AdSense from "../components/AdSense";
 import WordList from "../components/WordList";
 import VirtualWordList from "../components/VirtualWordList";
 import {
@@ -71,16 +72,34 @@ const HomePage = () => {
     <Box sx={{ position: "relative" }}>
       {/* Hero Section */}
       <Box sx={{ mb: 6, textAlign: "center" }}>
-        <Typography variant="h2" gutterBottom sx={{ fontWeight: 700 }}>
+        <Typography 
+          variant="h2" 
+          gutterBottom 
+          sx={{ 
+            fontWeight: 700,
+            fontSize: { xs: '2rem', sm: '3rem', md: '3.75rem' },
+          }}>
           Your Personal Vocabulary
         </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+        <Typography 
+          variant="h6" 
+          color="text.secondary" 
+          sx={{ 
+            mb: 4,
+            fontSize: { xs: '1rem', sm: '1.25rem' },
+            px: { xs: 2, sm: 0 }
+          }}>
           Search, review, and master words you&apos;ve collected.
         </Typography>
         
         {/* Integrated Stats in Hero */}
         {words && words.length > 0 && (
-          <Stack direction="row" spacing={3} justifyContent="center" sx={{ mb: 4 }}>
+          <Stack 
+            direction={{ xs: 'column', sm: 'row' }} 
+            spacing={{ xs: 2, sm: 3 }} 
+            justifyContent="center" 
+            alignItems="center"
+            sx={{ mb: 4 }}>
             <Box sx={{ textAlign: "center" }}>
               <Typography variant="h4" color="primary" fontWeight="bold">
                 {quickStats.totalWords}
@@ -110,9 +129,14 @@ const HomePage = () => {
       </Box>
 
       {/* Controls: Toggle and Tag Filter in a Row */}
-      <Box sx={{ my: 4, display: "flex", justifyContent: "center" }}>
+      <Box sx={{ 
+        my: { xs: 2, sm: 4 }, 
+        display: "flex", 
+        justifyContent: "center",
+        px: { xs: 2, sm: 0 }
+      }}>
         <Stack
-          direction="row"
+          direction={{ xs: 'column', sm: 'row' }}
           spacing={2}
           alignItems="center"
           sx={{
@@ -142,7 +166,10 @@ const HomePage = () => {
             </ToggleButton>
           </ToggleButtonGroup>
 
-          <FormControl sx={{ minWidth: 160 }} size="small">
+          <FormControl sx={{ 
+            minWidth: { xs: '100%', sm: 160 },
+            mt: { xs: 2, sm: 0 }
+          }} size="small">
             <InputLabel id="tag-select-label">Filter by Tag</InputLabel>
             <Select
               labelId="tag-select-label"
@@ -167,8 +194,18 @@ const HomePage = () => {
         </Stack>
       </Box>
 
+      {/* Ad placement between controls and search */}
+      <Box sx={{ my: 3 }}>
+        <AdSense adSlot="main-content-ad" style={{ display: 'block', textAlign: 'center' }} />
+      </Box>
+
       {/* Search */}
-      <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
+      <Box sx={{ 
+        mb: 4, 
+        display: "flex", 
+        justifyContent: "center",
+        px: { xs: 2, sm: 0 }
+      }}>
         <TextField
           label="Search for a word..."
           variant="outlined"

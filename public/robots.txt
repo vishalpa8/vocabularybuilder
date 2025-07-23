@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://vocabuilder.netlify.app/sitemap.xml
+
+# Prevent access to these directories
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
