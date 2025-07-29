@@ -4,10 +4,8 @@ import AdPlaceholder from './AdPlaceholder';
 
 const AdSense = ({ adSlot, style, height = { xs: 100, sm: 120, md: 150 } }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 3;
   const adRef = useRef(null);
+  const hasPushed = useRef(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
@@ -21,62 +19,38 @@ const AdSense = ({ adSlot, style, height = { xs: 100, sm: 120, md: 150 } }) => {
     return height;
   };
 
-  const initAd = async () => {
-    try {
-      await new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          reject(new Error('Ad loading timeout'));
-        }, 5000);
-
-        (window.adsbygoogle = window.adsbygoogle || []).push({
-          callback: () => {
-            clearTimeout(timeout);
-            resolve();
-          }
-        });
-      });
-
-      setIsLoading(false);
-      setHasError(false);
-    } catch (err) {
-      console.error('AdSense error:', err);
-      setHasError(true);
-      
-      if (retryCount < maxRetries) {
-        setTimeout(() => {
-          setRetryCount(prev => prev + 1);
-          initAd();
-        }, Math.pow(2, retryCount) * 1000);
-      }
-    }
-  };
-
   useEffect(() => {
+    const currentAdRef = adRef.current;
+    if (!currentAdRef) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
-          if (entry.isIntersecting && !hasError) {
-            initAd();
+          if (entry.isIntersecting) {
+            if (!hasPushed.current) {
+              hasPushed.current = true;
+              try {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+                setIsLoading(false);
+              } catch (e) {
+                console.error("AdSense error:", e);
+              }
+            }
+            observer.unobserve(currentAdRef);
           }
         });
       },
       { threshold: 0.1 }
     );
 
-    if (adRef.current) {
-      observer.observe(adRef.current);
-    }
+    observer.observe(currentAdRef);
 
     return () => {
-      if (adRef.current) {
-        observer.unobserve(adRef.current);
+      if (currentAdRef) {
+        observer.unobserve(currentAdRef);
       }
     };
-  }, [hasError, retryCount]);
-
-  if (hasError && retryCount >= maxRetries) {
-    return null;
-  }
+  }, [adSlot]);
 
   return (
     <Box sx={{ 

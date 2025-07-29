@@ -12,7 +12,7 @@ const PrivacyPolicy = () => {
           Last updated: [Current Date]
         </Typography>
         <Typography variant="body1" paragraph>
-          This Privacy Policy describes how Vocabulary Builder ("we," "us," or "our") collects, uses, and shares your personal information when you use our website.
+          This Privacy Policy describes how Vocabulary Builder (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) collects, uses, and shares your personal information when you use our website.
         </Typography>
         
         <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>
